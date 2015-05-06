@@ -9,19 +9,6 @@ WHERE
     ogc_fid=%d
     """
 
-#mpl = """
-#SELECT
-#    *
-#FROM
-#    country_bounds
-#WHERE
-#    cells.the_geom &&
-#    ST_Transform(ST_MakeEnvelope( %(lon1)0.7f, %(lat1)0.7f,
-#                                  %(lon2)0.7f, %(lat2)0.7f, 4326),
-#                                  4326)
-#LIMIT 1000
-#    """
-
 template_get_leaders = """
 SELECT
   userinfo.name, weekly_report.observations
@@ -53,13 +40,4 @@ def fetch_leaders(query):
     result = {'country_name': country_name, 'leaders': rows}
     print result
     return result
-    #cols = None
-    #ret = []
-    #for row in cursor:    
-        #if cols is None:
-        #    cols = [d[0] for d in cursor.description]
-        #rdict = dict(zip(cols, row))
-        #del rdict['the_geom']
-        #ret.append(rdict)
-    #return ret
 
