@@ -1,3 +1,4 @@
+import json
 import pg8000
 
 template_get_name = """
@@ -23,8 +24,12 @@ ORDER BY
 LIMIT 1000
 """
 
+with open('../db_connect_params.json') as f:
+   db_params = json.load(f)
 
-conn = pg8000.connect()
+conn = pg8000.connect(user=db_params['user'],
+                      password=db_params['password'],
+                      database=db_params['database'])
 def fetch_leaders(query):
     cursor = conn.cursor()
     sql = template_get_name % query
