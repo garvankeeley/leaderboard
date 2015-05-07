@@ -1,3 +1,5 @@
+CREATE EXTENSION postgis;
+CREATE EXTENSION postgis_topology;
 CREATE TABLE GRIDCELL (
     gridcell_pk serial NOT NULL,
     country_fk int NOT NULL,
