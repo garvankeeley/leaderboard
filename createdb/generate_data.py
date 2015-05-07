@@ -10,29 +10,14 @@ wgs84_id = 4326
 
 
 # Code from here, http://wiki.openstreetmap.org/wiki/Mercator
-def merc_x(lon):
-    r_major = 6378137.000
-    return r_major * math.radians(lon)
+# spherical world mercator (not elliptical)
+earth_radius = 6378137.000
 
+def lat2y_m(lat):
+    return earth_radius * math.log(math.tan(math.pi/4 + math.radians(lat) / 2))
 
-def merc_y(lat):
-    if lat > 89.5:
-        lat = 89.5
-    if lat < -89.5:
-        lat = -89.5
-    r_major = 6378137.000
-    r_minor = r_major  # orig code is r_minor=6356752.3142, which is not SRID 3857
-    temp = r_minor / r_major
-    eccent = math.sqrt(1 - temp ** 2)
-    phi = math.radians(lat)
-    sinphi = math.sin(phi)
-    con = eccent * sinphi
-    com = eccent / 2
-    con = ((1.0 - con) / (1.0 + con)) ** com
-    ts = math.tan((math.pi / 2 - phi) / 2) / con
-    y = 0 - r_major * math.log(ts)
-    return y
-
+def lon2x_m(lon):
+    return math.radian(lon) * earth_radius
 
 def get_easting_northing(lon, lat):
     conn = pg8000.connect()
@@ -41,8 +26,7 @@ def get_easting_northing(lon, lat):
                  (lon, lat, wgs84_id, mercator_id)
     curs.execute(q)
     easting, northing = curs.fetchone()[0].replace('POINT(', '').replace(')', '').split()
-    print northing, merc_y(lat), easting, merc_x(lon)
-    return easting, northing
+    return float(easting), float(northing)
 
 
 def create_cell_geo(lon, lat):
@@ -50,8 +34,8 @@ def create_cell_geo(lon, lat):
 
     # point to mercator, find nearest grid cell lower left
 
-    e_ll = math.floor(float(easting) * 2) / 2
-    n_ll = math.floor(float(northing) * 2) / 2
+    e_ll = math.floor(easting * 2) / 2
+    n_ll = math.floor(northing * 2) / 2
 
     dist_km = 0.5
     result = [(e_ll, n_ll), (e_ll, n_ll + dist_km), (e_ll + dist_km, n_ll + dist_km),
@@ -202,6 +186,9 @@ def doit():
 #create_random_users()
 #doit()
 
-p = (-9.4, 51.5)
-c = get_or_create_cell(p)
+#p = (-9.4, 51.5)
+#c = get_or_create_cell(p)
+test_north_m = lat2y_m(43.5)
+east, north = get_easting_northing(-79, 43.5)
+print abs(test_north_m - north)
 
