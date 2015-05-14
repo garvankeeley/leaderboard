@@ -1,13 +1,10 @@
 import json
 import pg8000
 import sys
-import geopy, math
-from geopy.distance import vincenty
-from math import radians, cos, sin, asin, sqrt
+import math
 
 mercator_id = 3857 # http://en.wikipedia.org/wiki/Web_Mercator 3785 # 900913 or 3857
 wgs84_id = 4326
-
 
 # Code from here, http://wiki.openstreetmap.org/wiki/Mercator
 # spherical world mercator (not elliptical)
@@ -17,7 +14,7 @@ def lat2y_m(lat):
     return earth_radius * math.log(math.tan(math.pi/4 + math.radians(lat) / 2))
 
 def lon2x_m(lon):
-    return math.radian(lon) * earth_radius
+    return math.radians(lon) * earth_radius
 
 def get_easting_northing(lon, lat):
     conn = pg8000.connect()
@@ -34,12 +31,12 @@ def create_cell_geo(lon, lat):
 
     # point to mercator, find nearest grid cell lower left
 
-    e_ll = math.floor(easting * 2) / 2
-    n_ll = math.floor(northing * 2) / 2
+    e_ll = math.floor(easting / 1000.0 * 2.0) / 2.0 * 1000.0
+    n_ll = math.floor(northing / 1000.0 * 2.0) / 2.0 * 1000.0
 
-    dist_km = 0.5
-    result = [(e_ll, n_ll), (e_ll, n_ll + dist_km), (e_ll + dist_km, n_ll + dist_km),
-              (e_ll + dist_km, n_ll), (e_ll, n_ll)]
+    dist_m = 500
+    result = [(e_ll, n_ll), (e_ll, n_ll + dist_m), (e_ll + dist_m, n_ll + dist_m),
+              (e_ll + dist_m, n_ll), (e_ll, n_ll)]
     return result
 
 #if __name__ == '__main__':
@@ -188,7 +185,19 @@ def doit():
 
 #p = (-9.4, 51.5)
 #c = get_or_create_cell(p)
-test_north_m = lat2y_m(43.5)
-east, north = get_easting_northing(-79, 43.5)
-print abs(test_north_m - north)
+
+for i in range(0, 1000):
+    a = randint(0, 85*2) - 85
+    b = randint(0, 85*2) - 85
+    e_m = lon2x_m(a)
+    n_m = lat2y_m(b)
+    #print a,b
+    east, north = get_easting_northing(a, b)
+    d1 = abs(n_m - north)
+    d2 =  abs(e_m - east)
+    if (d1 + d2 > 0.001) :
+        print "error"
+
+
+
 
