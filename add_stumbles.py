@@ -1,36 +1,22 @@
 import json
 import pg8000
 
-template_get_name = """
-SELECT
-    name
-FROM
-    country_bounds
-WHERE
-    ogc_fid=%d
-    """
-
-template_get_leaders = """
-SELECT
-  userinfo.name, weekly_report.observations
-FROM
-  weekly_report, userinfo, tile
-WHERE
-  tile.country_fk = %d AND
-  weekly_report.userinfo_fk = userinfo.userinfo_pk AND
-  tile.tile_pk = weekly_report.tile_fk
-ORDER BY
-  weekly_report.observations DESC
-LIMIT 1000
-"""
-
 with open('../db_connect_params.json') as f:
    db_params = json.load(f)
 
 conn = pg8000.connect(user=db_params['user'],
                       password=db_params['password'],
                       database=db_params['database'])
-def fetch_leaders(query):
+
+key_grid = 'tile'
+key_cellcount = 'cellcount'
+key_wificount = 'wificount'
+
+def add_stumbles_for_user(email, login_token, query_json):
+    grid_num = query_json[key_grid]
+    cellcount = query_json[key_cellcount]
+    wificount = query_json[key_wificount]
+
     cursor = conn.cursor()
     sql = template_get_name % query
     cursor.execute(sql)
