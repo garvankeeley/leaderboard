@@ -1,6 +1,9 @@
 import json
 import pg8000
 import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from util import coord_utils
 
 def create_random_users():
     conn = pg8000.connect()
@@ -9,14 +12,14 @@ def create_random_users():
         try:
             curs.execute("INSERT INTO userinfo(name) VALUES ('%s')" % ('name' + str(i)))
             conn.commit()
-        except:
+        except pg8000.Error:
             print sys.exc_info()[0]
             conn.rollback()
             conn = pg8000.connect()
             curs = conn.cursor()
 
 from random import randint
-def func(coords):
+def create_some_tiles(coords):
     for coord in coords:
         lat = coord[1]
         lon = coord[0]
@@ -24,7 +27,7 @@ def func(coords):
             print "bad lat lon: ", lat, lon
             return None
 
-    geo = get_easting_northing(lon, lat)
+    geo = coord_utils.db_get_easting_northing(lon, lat)
 
         # cell = get_or_create_cell(coord)
         # if not cell:
@@ -43,7 +46,7 @@ def doit():
         for item in data['features']:
             print item['id']
             for c in item['geometry']['coordinates']:
-                func(c)
+                create_some_tiles(c)
 
 #create_random_users()
 #doit()
@@ -54,13 +57,13 @@ def doit():
 for i in range(0, 1000):
     a = randint(0, 85*2) - 85
     b = randint(0, 85*2) - 85
-    e_m = lon2x_m(a)
-    n_m = lat2y_m(b)
+    e_m = coord_utils.lon2x_m(a)
+    n_m = coord_utils.lat2y_m(b)
     #print a,b
-    east, north = get_easting_northing(a, b)
+    east, north = coord_utils.db_get_easting_northing(a, b)
     d1 = abs(n_m - north)
     d2 =  abs(e_m - east)
-    if (d1 + d2 > 0.001) :
+    if d1 + d2 > 0.001:
         print "error"
 
 

@@ -14,24 +14,24 @@ class FetchLeaders:
 
 class AddStumblesForUser:
     def on_post(self, req, resp):
-      resp.content_type = 'application/json'
-      req.get_header('bearer_token')
-      # resp.body = json.dumps(
-      try:
-        raw_json = req.stream.read()
-      except Exception as ex:
-        raise falcon.HTTPError(falcon.HTTP_400, 'Error', ex.message)
+        resp.content_type = 'application/json'
+        req.get_header('bearer_token')
+        # resp.body = json.dumps(
+        try:
+            raw_json = req.stream.read()
+        except Exception as ex:
+            raise falcon.HTTPError(falcon.HTTP_400, 'Error', ex.message)
 
-      try:
-          as_json = json.loads(raw_json, encoding='utf-8')
-      except ValueError:
-          raise falcon.HTTPError(falcon.HTTP_400,
+        try:
+            as_json = json.loads(raw_json, encoding='utf-8')
+        except ValueError:
+            raise falcon.HTTPError(falcon.HTTP_400,
                   'Malformed JSON',
                   'Could not decode the request body. The '
                   'JSON was incorrect.')
-      # resp.status = falcon.HTTP_202 # or 200?
-      add_stumbles_for_user(email=None, login_token=None, query_json=as_json)
-      # resp.body = json.dumps(add_stumbles_for_user(result_json), encoding='utf-8')
+        # resp.status = falcon.HTTP_202 # or 200?
+        add_stumbles_for_user(email=None, login_token=None, query_json=as_json)
+        # resp.body = json.dumps(add_stumbles_for_user(result_json), encoding='utf-8')
 
 app = falcon.API(after=[crossdomain])
 app.add_route('/leaders', FetchLeaders())

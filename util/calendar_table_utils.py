@@ -68,7 +68,7 @@ def get_week_table_stats(userpk, tilepk):
     curs = conn.cursor()
     try:
         curs.execute(query)
-    except:
+    except pg8000.Error:
         return None
     # TODO fill this in properly
     return curs.fetchone()[0]
