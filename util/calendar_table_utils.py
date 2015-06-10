@@ -82,3 +82,4 @@ def week_num_of_year():
 def year_and_month_num():
     now = datetime.datetime.now()
     return "%d%d" % (now.year, now.month)
+
