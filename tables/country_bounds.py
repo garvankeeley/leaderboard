@@ -1,15 +1,14 @@
-from sqlalchemy.ext.declarative import declarative_base
+from geoalchemy2 import Geometry
 from sqlalchemy import Column, Integer, String
-import geo_util.coord_sys as cs
-
-Base = declarative_base()
+from ..geo_util import coord_sys as cs
+import db
 
 creation_command = 'ogr2ogr -f PostgreSQL PG:"port=5432" *.geo.json -nln country_bounds'
 
-class CountryBounds(Base):
+class CountryBounds(db.get_db().Base):
     __tablename__ = 'country_bounds'
     ogc_fid = Column(Integer, primary_key=True)
-    wkb_geometry = Column(Geometry(geometry_type='POLYGON', srid=cs.WGS84_LATLON_CODE))
+    wkb_geometry = Column(Geometry(geometry_type='Geometry', srid=cs.WGS84_LATLON_CODE))
     name = Column(String, nullable=False)
 
     @staticmethod
