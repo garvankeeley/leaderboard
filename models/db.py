@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.reflection import Inspector
 
-class DB:
+class DB(object):
     instance = None
 
     def __init__(self):
@@ -18,7 +18,13 @@ class DB:
         inspector = Inspector.from_engine(get_db().engine)
         return name in inspector.get_table_names()
 
+    def commit(self):
+        self.session.commit()
+
 def get_db():
+    """
+    :rtype: DB
+    """
     if not DB.instance:
         DB.instance = DB()
     return DB.instance

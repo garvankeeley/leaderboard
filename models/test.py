@@ -1,6 +1,7 @@
+import math
 from db import get_db
 from country_bounds import CountryBounds
-from ..util import utils
+from geo_util import coord_utils
 from user import User
 from tile import Tile
 import calendar
@@ -19,7 +20,7 @@ class Test(object):
         for tbl in reversed(get_db().metadata.sorted_tables):
             get_db().engine.execute(tbl.delete())
 
-    def test_countries(self):
+    def test_countries_id_is_correct(self):
         row = get_db().session.query(CountryBounds).filter_by(name='Afghanistan')
         assert row
         item = row.first()
@@ -49,7 +50,7 @@ class Test(object):
 
     def test_add_tile_for_coord(self):
         tile = Tile()
-        mercator_coords = utils.create_tile_geo(-79.4, 43.7)
+        mercator_coords = Tile.create_tile_ewkt_wgs84(-79.4, 43.7)
         tile.geometry = mercator_coords
         get_db().session.add(tile)
         get_db().session.commit()
@@ -63,3 +64,10 @@ class Test(object):
 
         CountryBounds.set_country_for_tile(tile, use_nearby=True)
         assert tile.country == canada
+
+    def test_coord_conversion(self):
+        e1 = coord_utils.lon2x_m(-80)
+        n1 = coord_utils.lat2y_m(44)
+        e2, n2 = coord_utils.db_get_easting_northing(-80, 44)
+        assert math.fabs(e1 - e2) < 5
+        assert math.fabs(n1 - n2) < 5

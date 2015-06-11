@@ -1,9 +1,12 @@
 import json
-import pg8000
 import sys
 import os
+
+import pg8000
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from util import coord_utils
+from geo_util import coord_utils
+
 
 def create_random_users():
     conn = pg8000.connect()
