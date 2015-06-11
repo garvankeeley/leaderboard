@@ -1,7 +1,6 @@
 from geoalchemy2 import Geometry, func
-from geoalchemy2.elements import WKTElement
 from sqlalchemy import Column, Integer, String
-from ..geo_util import coord_sys as cs
+from geo_util import coord_sys as cs
 from db import get_db
 
 creation_command = 'ogr2ogr -f PostgreSQL PG:"port=5432" *.geo.json -nln country_bounds'
@@ -21,7 +20,7 @@ class CountryBounds(get_db().Base):
         import ogr
         import os
         pwd = os.path.dirname(os.path.abspath(__file__))
-        infile = "%s/../createdb/world.geo.json" % pwd
+        infile = "%s/../fixtures/world.geo.json" % pwd
         print infile
         drv = ogr.GetDriverByName('GeoJSON')
         assert drv

@@ -1,7 +1,8 @@
 import falcon
 import json
 from leaders import fetch_leaders
-from add_stumbles import add_stumbles_for_user
+import route_endpoints
+
 
 def crossdomain(req, resp):
     # review this
@@ -30,7 +31,7 @@ class AddStumblesForUser:
                   'Could not decode the request body. The '
                   'JSON was incorrect.')
         # resp.status = falcon.HTTP_202 # or 200?
-        add_stumbles_for_user(email=None, login_token=None, query_json=as_json)
+        route_endpoints.add_stumbles_for_user(email=None, login_token=None, query_json=as_json)
         # resp.body = json.dumps(add_stumbles_for_user(result_json), encoding='utf-8')
 
 app = falcon.API(after=[crossdomain])

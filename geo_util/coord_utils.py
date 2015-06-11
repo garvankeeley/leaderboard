@@ -18,7 +18,7 @@ def db_get_easting_northing(lon, lat):
     q = "SELECT ST_AsText(%s)" % db_coord_transform(lon, lat, cs.WGS84_LATLON_CODE, cs.WEB_MERCATOR_CODE)
     curs.execute(q)
     easting, northing = curs.fetchone()[0].replace('POINT(', '').replace(')', '').split()
-    return float(easting), float(northing)
+    return round(float(easting)), round(float(northing))
 
 def db_coord_transform_from_string(lng_lat_string, src_epsg, dest_epsg):
     geo = "ST_GeomFromText('%s', %d)" % (lng_lat_string, src_epsg)

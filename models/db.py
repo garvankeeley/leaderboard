@@ -21,6 +21,9 @@ class DB(object):
     def commit(self):
         self.session.commit()
 
+    def add(self, obj):
+        self.session.add(obj)
+
 def get_db():
     """
     :rtype: DB

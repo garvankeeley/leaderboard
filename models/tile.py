@@ -4,7 +4,7 @@ from sqlalchemy import Column, BigInteger, Integer, ForeignKey, func
 from geoalchemy2 import Geometry
 from sqlalchemy.orm import relationship, backref
 
-from ..geo_util import coord_sys as cs
+from geo_util import coord_sys as cs
 from db import get_db
 from country_bounds import CountryBounds
 from geo_util import coord_utils
@@ -35,10 +35,10 @@ class Tile(get_db().Base):
     @staticmethod
     def get_tile_mercator(easting, northing):
         r = get_db().session.query(Tile).filter(func.ST_Contains(
-            Tile.geometry, 'POINT(%d, %d)' % (easting, northing))).first()
+            Tile.geometry, func.ST_SetSRID(func.ST_Point(easting, northing), cs.WEB_MERCATOR_CODE))).first()
         if r:
             return r
-        ewkt = Tile.create_tile_ewkt(easting, northing)
+        ewkt = Tile.create_tile_ewkt_mercator(easting, northing)
         tile = Tile()
         tile.geometry = ewkt
         CountryBounds.set_country_for_tile(tile)

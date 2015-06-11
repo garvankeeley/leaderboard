@@ -48,14 +48,18 @@ def get_week_table_class(week_of_year):
     return Week
 
 
+def get_current_week_table_class():
+    week_num = week_num_of_year()
+    Week = get_week_table_class(week_num)
+    return Week
+
 def get_week_table_stats(user, tile):
-    Week = get_week_table_class(0)
-    # session.query(User, Tile, Week)
-    #user.current_weeks
+    Week = get_current_week_table_class()
     return get_db().session.query(Week).filter(and_(Week.user == user, Week.tile == tile)).first()
 
+
 def insert_or_update_week(user, tile):
-    Week = get_week_table_class(0)
+    Week = get_current_week_table_class()
 
     db = get_db()
     if not db.table_exists(Week.__tablename__):

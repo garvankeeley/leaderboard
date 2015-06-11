@@ -44,7 +44,7 @@ def create_some_tiles(coords):
         #         print ex
 
 def doit():
-    with open('../geojson/world.geo.json') as data_file:
+    with open('../fixtures/world.geo.json') as data_file:
         data = json.load(data_file)
         for item in data['features']:
             print item['id']
