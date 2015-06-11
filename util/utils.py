@@ -1,6 +1,8 @@
 import pg8000
 import math
 import coord_utils
+from ..geo_util import coord_sys as cs
+
 
 def create_tile_geo(lon, lat):
     easting, northing = coord_utils.db_get_easting_northing(lon, lat)
@@ -11,9 +13,10 @@ def create_tile_geo(lon, lat):
     n_ll = math.floor(northing / 1000.0 * 2.0) / 2.0 * 1000.0
 
     dist_m = 500
-    result = [(e_ll, n_ll), (e_ll, n_ll + dist_m), (e_ll + dist_m, n_ll + dist_m),
+    geo = [(e_ll, n_ll), (e_ll, n_ll + dist_m), (e_ll + dist_m, n_ll + dist_m),
               (e_ll + dist_m, n_ll), (e_ll, n_ll)]
-    return result
+    geo_string = 'POLYGON((' + ','.join([' '.join([str(a) for a in x]) for x in geo]) + '))'
+    return 'SRID=%d;%s' % (cs.WEB_MERCATOR_CODE, geo_string)
 
 def get_country_for_polygon(geo_string):
     transform = coord_utils.wgs84_string_coord_to_mercator(geo_string)

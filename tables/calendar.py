@@ -5,7 +5,8 @@ from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger, and_
 from sqlalchemy.orm import relationship, backref
 from tile import Tile
 from user import User
-from db import get_db
+from db import get_db, DB
+
 
 def weekly_table_name():
     return "WEEK_%d_PER_TILE_PER_USER" % week_num_of_year()
@@ -56,11 +57,10 @@ def get_week_table_stats(user, tile):
 def insert_or_update_week(user, tile):
     Week = get_week_table_class(0)
 
-    from sqlalchemy.engine.reflection import Inspector
-    inspector = Inspector.from_engine(get_db().engine)
-    if not Week.__tablename__ in inspector.get_table_names():
-        get_db().metadata.create_all(get_db().engine)
-        get_db().session.commit()
+    db = get_db()
+    if not db.table_exists(Week.__tablename__):
+        db.metadata.create_all(get_db().engine)
+        db.session.commit()
 
     existing = get_week_table_stats(user, tile)
     if existing:
@@ -69,5 +69,5 @@ def insert_or_update_week(user, tile):
     w = Week()
     w.user = user
     w.tile = tile
-    get_db().session.add(w)
+    db.session.add(w)
     return w
