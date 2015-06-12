@@ -8,7 +8,6 @@ import test_submit
 
 class TestLeaders(object):
     def setup(self):
-        print 'setup'
         get_db().drop_all()
         get_db().create_all()
 
@@ -16,8 +15,19 @@ class TestLeaders(object):
         get_db().drop_all()
 
     def test_leaders(self):
-        t = test_submit.TestSubmit()
-        t.test_submit()
-        get_leaders.get_leaders(29)
-        get_db().commit()
-        assert True
+        user = test_submit.create_one_user()
+        test_submit.submit_helper(test_submit.submitted_json, user)
+
+        json = '''
+            [
+                { "tile_easting_northing":"100,-700", "observations":200 },
+                { "tile_easting_northing":"100,-700", "observations":3 }
+            ]
+        '''
+
+        test_submit.submit_helper(json, user)
+        result = get_leaders.get_leaders(29)
+        assert result
+        user_result, total = result[0]
+        assert user_result == user
+        assert total == 101

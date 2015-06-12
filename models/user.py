@@ -1,4 +1,5 @@
-from sqlalchemy import Column, BigInteger, Integer, String
+from sqlalchemy import Column, BigInteger, Integer, String, select, func, and_
+from sqlalchemy.orm import column_property
 from db import get_db
 
 class User(get_db().Base):

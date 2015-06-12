@@ -20,13 +20,8 @@ class TestSubmit(object):
         get_db().drop_all()
 
     def test_submit(self):
-        user = User()
-        user.bearer_token = 'abc'
-        user.email = 'foo@foo.com'
-        user.nickname = 'nick'
-        get_db().add(user)
-        get_db().commit()
-        add_stumbles_for_user(user.email, user.bearer_token, submitted_json)
+        user = create_one_user()
+        submit_helper(submitted_json)
         # check user has 1 tile, 1 weekX row, and total obs is 101
         weekly_per_tile = user.get_reports_weekly()
         assert len(weekly_per_tile) == 1
@@ -47,3 +42,19 @@ class TestSubmit(object):
         ok = add_stumbles_for_user(user.email, 'cdf', "")
         assert not ok
         get_db().commit()
+
+user_counter = 0
+def create_one_user():
+    global user_counter
+    user_counter += 1
+    user = User()
+    user.bearer_token = 'abc%d' % user_counter
+    user.email = 'foo@foo.com%d' % user_counter
+    user.nickname = 'nick%d' % user_counter
+    get_db().add(user)
+    get_db().commit()
+    return user
+
+def submit_helper(json, user):
+    add_stumbles_for_user(user.email, user.bearer_token, json)
+    get_db().commit()

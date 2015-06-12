@@ -7,7 +7,6 @@ class DB(object):
     instance = None
 
     def __init__(self):
-        print 'setup db'
         self.engine = create_engine('postgresql+pg8000://localhost', echo=True)
         self.Base = declarative_base(self.engine)
         db_session = sessionmaker(bind=self.engine, expire_on_commit=False)
