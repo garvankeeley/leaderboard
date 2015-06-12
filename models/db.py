@@ -47,7 +47,7 @@ class DB(object):
         from models.country_bounds import CountryBounds
         from models.user import User
         from models.tile import Tile
-        from models.calendar import get_current_week_table_class
+        from models.calendar_factory import get_current_week_table_class
         wk = get_current_week_table_class()
         if self.table_exists(wk.__tablename__):
             t = wk.__table__

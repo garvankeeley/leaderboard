@@ -4,7 +4,7 @@ from country_bounds import CountryBounds
 from geo_util import coord_utils
 from user import User
 from tile import Tile
-import calendar
+import calendar_factory
 
 class Test(object):
     def setup(self):
@@ -38,7 +38,7 @@ class Test(object):
         db.session.add(tile)
         db.session.commit()
 
-        w = calendar.insert_or_update_week(user, tile)
+        w = calendar_factory.insert_or_update_week(user, tile)
         db.session.commit()
         assert True
 
