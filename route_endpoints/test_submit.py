@@ -13,17 +13,11 @@ submitted_json = '''
 
 class TestSubmit(object):
     def setup(self):
-        print 'setup'
-        self.teardown()
-        db = get_db()
-        db.metadata.create_all(db.engine)
-        db.session.commit()
-
-        CountryBounds.load_countries()
+        get_db().drop_all()
+        get_db().create_all()
 
     def teardown(self):
-        for tbl in reversed(get_db().metadata.sorted_tables):
-            get_db().engine.execute(tbl.delete())
+        get_db().drop_all()
 
     def test_submit(self):
         user = User()

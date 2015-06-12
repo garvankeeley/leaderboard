@@ -63,7 +63,7 @@ def insert_or_update_week(user, tile):
 
     db = get_db()
     if not db.table_exists(Week.__tablename__):
-        db.metadata.create_all(get_db().engine)
+        db.get_metadata().create_all(get_db().engine)
         db.session.commit()
 
     existing = get_week_table_stats(user, tile)
@@ -73,5 +73,5 @@ def insert_or_update_week(user, tile):
     w = Week()
     w.user = user
     w.tile = tile
-    db.session.add(w)
+    db.get_session().add(w)
     return w
