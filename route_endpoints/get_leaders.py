@@ -1,6 +1,6 @@
 from decimal import Decimal
 from sqlalchemy import desc
-from models import calendar_factory, db, user, tile
+from models import calendar_factory, db, user, tile, country_bounds
 from geoalchemy2 import func
 
 def get_leaders(country_id):
@@ -17,4 +17,11 @@ def get_leaders(country_id):
         assert isinstance(result[0][0], user.User)
         assert isinstance(result[0][1], Decimal)
 
-    return result
+    rows = []
+    for row in result:
+        rows.append({'name': row[0].nickname, 'observations': row[1]})
+
+    country_name = db.get_db().get_session().query(country_bounds.CountryBounds.name).\
+        filter_by(ogc_fid=country_id).first()
+
+    return {'country_name': country_name, 'leaders': rows}

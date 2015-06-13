@@ -1,10 +1,9 @@
-from models.country_bounds import CountryBounds
 from models.db import get_db
 from models.user import User
 from models.calendar_factory import get_current_week_table_class
 from submit_user_observations import add_stumbles_for_user
 
-submitted_json = '''
+canada_observations_json = '''
     [
         { "tile_easting_northing":"-8872100,5435700", "observations":100 },
         { "tile_easting_northing":"-8872100,5435700", "observations":1 }
@@ -21,7 +20,7 @@ class TestSubmit(object):
 
     def test_submit(self):
         user = create_one_user()
-        submit_helper(submitted_json, user)
+        submit_helper(canada_observations_json, user)
         # check user has 1 tile, 1 weekX row, and total obs is 101
         weekly_per_tile = user.get_reports_weekly()
         assert len(weekly_per_tile) == 1

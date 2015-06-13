@@ -1,8 +1,7 @@
 import calendar
 import datetime
-import math
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger, and_
+from sqlalchemy import Column, Integer, ForeignKey, BigInteger, and_
 from sqlalchemy.orm import relationship, backref
 from tile import Tile
 from user import User

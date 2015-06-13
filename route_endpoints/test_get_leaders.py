@@ -1,9 +1,5 @@
-from models.country_bounds import CountryBounds
 from models.db import get_db
-from models.user import User
-from models.calendar_factory import get_current_week_table_class
 from route_endpoints import get_leaders
-from submit_user_observations import add_stumbles_for_user
 import test_submit
 
 class TestLeaders(object):
@@ -16,7 +12,7 @@ class TestLeaders(object):
 
     def test_leaders(self):
         user = test_submit.create_one_user()
-        test_submit.submit_helper(test_submit.submitted_json, user)
+        test_submit.submit_helper(test_submit.canada_observations_json, user)
 
         json = '''
             [
@@ -28,14 +24,15 @@ class TestLeaders(object):
         test_submit.submit_helper(json, user)
         result = get_leaders.get_leaders(29)
         assert result
-        user_result, total = result[0]
-        assert user_result == user
-        assert total == 101
+        row0 = result['leaders'][0]
+        assert row0['name'] == user.nickname
+        assert row0['observations'] == 101
 
         user2 = test_submit.create_one_user()
-        test_submit.submit_helper(test_submit.submitted_json, user2)
-        test_submit.submit_helper(test_submit.submitted_json, user2)
+        test_submit.submit_helper(test_submit.canada_observations_json, user2)
+        test_submit.submit_helper(test_submit.canada_observations_json, user2)
         result = get_leaders.get_leaders(29)
         assert result
-        assert result[0][0] == user2
-        assert result[0][1] == 202
+        row0 = result['leaders'][0]
+        assert row0['name'] == user2.nickname
+        assert row0['observations'] == 202
