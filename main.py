@@ -1,7 +1,6 @@
 import falcon
 import json
-from leaders import fetch_leaders
-import route_endpoints
+import route_endpoints.get_leaders
 
 
 def crossdomain(req, resp):
@@ -11,7 +10,7 @@ def crossdomain(req, resp):
 class FetchLeaders:
     def on_get(self, req, resp):
         resp.content_type = "application/json"
-        resp.body = json.dumps(fetch_leaders(int(req.query_string)))
+        resp.body = json.dumps(route_endpoints.get_leaders_for_country(int(req.query_string)))
 
 class AddStumblesForUser:
     def on_post(self, req, resp):

@@ -64,7 +64,7 @@ def get_current_week_table_class():
     week_class = get_week_table_class(None)
     return week_class
 
-def get_week_table_stats(user, tile):
+def get_week_table_for_user_and_tile(user, tile):
     Week = get_current_week_table_class()
     return get_db().session.query(Week).filter(and_(Week.user == user, Week.tile == tile)).first()
 
@@ -77,7 +77,7 @@ def insert_or_update_week(user, tile):
         db.get_metadata().create_all(get_db().engine)
         db.session.commit()
 
-    existing = get_week_table_stats(user, tile)
+    existing = get_week_table_for_user_and_tile(user, tile)
     if existing:
         return existing
 

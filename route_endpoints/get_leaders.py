@@ -3,7 +3,7 @@ from sqlalchemy import desc
 from models import calendar_factory, db, user, tile, country_bounds
 from geoalchemy2 import func
 
-def get_leaders(country_id):
+def get_leaders_for_country(country_id):
     Week = calendar_factory.get_current_week_table_class()
     q = db.get_db().get_session().query(user.User,
                                         func.sum(Week.observation_count).label('obs_sum')).\
