@@ -1,5 +1,6 @@
 from models.db import get_db
 from route_endpoints import get_leaders
+from route_endpoints.get_leaders import get_leaders_for_country
 import test_submit
 
 class TestLeaders(object):
@@ -22,7 +23,7 @@ class TestLeaders(object):
         '''
 
         test_submit.submit_helper(json, user)
-        result = get_leaders.get_leaders(29)
+        result = get_leaders_for_country(29)
         assert result
         row0 = result['leaders'][0]
         assert row0['name'] == user.nickname
