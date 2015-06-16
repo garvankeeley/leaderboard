@@ -1,8 +1,8 @@
 import json
-from models.db import get_db
-from models.tile import Tile
-from models.user import User
-from models.calendar_factory import insert_or_update_week
+from leaderboard.models.db import get_db
+from leaderboard.models.tile import Tile
+from leaderboard.models.user import User
+from leaderboard.models.calendar_factory import insert_or_update_week
 key_tile_easting_northing = 'tile_easting_northing'
 key_observations = 'observations'
 

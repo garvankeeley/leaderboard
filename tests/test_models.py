@@ -1,10 +1,10 @@
 import math
-from db import get_db
-from country_bounds import CountryBounds
-from geo_util import coord_utils
-from user import User
-from tile import Tile
-import calendar_factory
+from leaderboard.models.db import get_db
+from leaderboard.models.country_bounds import CountryBounds
+from leaderboard.geo_util import coord_utils
+from leaderboard.models.user import User
+from leaderboard.models.tile import Tile
+from leaderboard.models import calendar_factory
 
 class Test(object):
     def setup(self):

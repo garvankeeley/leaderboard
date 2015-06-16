@@ -1,7 +1,7 @@
 from decimal import Decimal
-from sqlalchemy import desc
-from models import calendar_factory, db, user, tile, country_bounds
 from geoalchemy2 import func
+from leaderboard.models import calendar_factory, db, user, tile, country_bounds
+from sqlalchemy import desc
 
 def get_leaders_for_country(country_id):
     Week = calendar_factory.get_current_week_table_class()

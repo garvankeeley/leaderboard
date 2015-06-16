@@ -44,10 +44,10 @@ class DB(object):
     def drop_all(self):
         # endure session is committed
         self.commit()
-        from models.country_bounds import CountryBounds
-        from models.user import User
-        from models.tile import Tile
-        from models.calendar_factory import get_current_week_table_class
+        from leaderboard.models.country_bounds import CountryBounds
+        from leaderboard.models.user import User
+        from leaderboard.models.tile import Tile
+        from leaderboard.models.calendar_factory import get_current_week_table_class
         wk = get_current_week_table_class()
         if self.table_exists(wk.__tablename__):
             t = wk.__table__

@@ -1,7 +1,9 @@
-from models.db import get_db
-from route_endpoints import get_leaders
-from route_endpoints.get_leaders import get_leaders_for_country
+from leaderboard.models.db import get_db
+from leaderboard.route_endpoints import get_leaders
+from leaderboard.route_endpoints.get_leaders import get_leaders_for_country
+
 import test_submit
+
 
 class TestLeaders(object):
     def setup(self):

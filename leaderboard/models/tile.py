@@ -4,10 +4,10 @@ from sqlalchemy import Column, BigInteger, Integer, ForeignKey, func
 from geoalchemy2 import Geometry
 from sqlalchemy.orm import relationship, backref
 
-from geo_util import coord_sys as cs
-from db import get_db
-from country_bounds import CountryBounds
-from geo_util import coord_utils
+from leaderboard.geo_util import coord_sys as cs
+from leaderboard.models.db import get_db
+from leaderboard.models.country_bounds import CountryBounds
+from leaderboard.geo_util import coord_utils
 
 
 class Tile(get_db().Base):

@@ -1,7 +1,7 @@
-from models.db import get_db
-from models.user import User
-from models.calendar_factory import get_current_week_table_class
-from submit_user_observations import add_stumbles_for_user
+from leaderboard.models.db import get_db
+from leaderboard.models.user import User
+from leaderboard.models.calendar_factory import get_current_week_table_class
+from leaderboard.route_endpoints.submit_user_observations import add_stumbles_for_user
 
 canada_observations_json = '''
     [

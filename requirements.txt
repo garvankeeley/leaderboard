@@ -1,4 +1,4 @@
-Cython==0.22
+#Cython==0.22
 GDAL==1.10.0
 GeoAlchemy2==0.2.4
 SQLAlchemy==1.0.4

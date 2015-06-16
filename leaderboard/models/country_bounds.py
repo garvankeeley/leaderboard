@@ -1,7 +1,7 @@
 from geoalchemy2 import Geometry, func
 from sqlalchemy import Column, Integer, String
-from geo_util import coord_sys as cs
-from db import get_db
+from leaderboard.geo_util import coord_sys as cs
+from leaderboard.models.db import get_db
 
 creation_command = 'ogr2ogr -f PostgreSQL PG:"port=5432" *.geo.json -nln country_bounds'
 
