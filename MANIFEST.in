@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+include db_connection_params.json
+recursive-include leaderboard *.py

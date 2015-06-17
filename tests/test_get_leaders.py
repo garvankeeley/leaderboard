@@ -34,7 +34,7 @@ class TestLeaders(object):
         user2 = test_submit.create_one_user()
         test_submit.submit_helper(test_submit.canada_observations_json, user2)
         test_submit.submit_helper(test_submit.canada_observations_json, user2)
-        result = get_leaders.get_leaders(29)
+        result = get_leaders_for_country(29)
         assert result
         row0 = result['leaders'][0]
         assert row0['name'] == user2.nickname

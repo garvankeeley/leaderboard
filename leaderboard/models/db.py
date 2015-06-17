@@ -3,11 +3,23 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.reflection import Inspector
 
+import json
+import pkgutil
+
 class DB(object):
     instance = None
 
     def __init__(self):
-        self.engine = create_engine('postgresql+pg8000://localhost', echo=True)
+        # Try to load the database connection from the configuration
+        # in the package, otherwise just use default connection
+        # params.
+        json_data = pkgutil.get_data('leaderboard', 'db_connection_params.json')
+        jdata = json.loads(json_data)
+
+        conn_tmpl = 'postgresql+pg8000://%(user)s:%(password)s@localhost/%(database)s'
+        conn_str = conn_tmpl % jdata
+        self.engine = create_engine(conn_str, echo=True)
+
         self.Base = declarative_base(self.engine)
         db_session = sessionmaker(bind=self.engine, expire_on_commit=False)
         self.session = db_session()
@@ -32,9 +44,9 @@ class DB(object):
         return self.Base.metadata
 
     def create_all(self):
-        from models.country_bounds import CountryBounds
-        from models.user import User
-        from models.tile import Tile
+        from leaderboard.models.country_bounds import CountryBounds
+        from leaderboard.models.user import User
+        from leaderboard.models.tile import Tile
         do_load = not self.table_exists(CountryBounds.__tablename__)
         self.get_metadata().create_all(self.engine)
 
