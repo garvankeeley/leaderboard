@@ -11,6 +11,6 @@ class User(get_db().Base):
     bearer_token = Column(String)
 
     def get_reports_weekly(self):
-        from models.calendar_factory import get_current_week_table_class
+        from leaderboard.models.calendar_factory import get_current_week_table_class
         weeks = getattr(self, '%ss' % get_current_week_table_class().__tablename__)
         return weeks
