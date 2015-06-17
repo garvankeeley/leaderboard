@@ -1,4 +1,4 @@
-import pg8000
+from leaderboard.models.db import DB
 import math
 import coord_sys as cs
 
@@ -13,10 +13,9 @@ def lon2x_m(lon):
     return math.radians(lon) * earth_radius
 
 def db_get_easting_northing(lon, lat):
-    conn = pg8000.connect()
-    curs = conn.cursor()
+    curs = DB().get_session()
     q = "SELECT ST_AsText(%s)" % db_coord_transform(lon, lat, cs.WGS84_LATLON_CODE, cs.WEB_MERCATOR_CODE)
-    curs.execute(q)
+    curs.query(q)
     easting, northing = curs.fetchone()[0].replace('POINT(', '').replace(')', '').split()
     return round(float(easting)), round(float(northing))
 
