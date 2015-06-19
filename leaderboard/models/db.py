@@ -1,11 +1,15 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.reflection import Inspector
 from os.path import expanduser, join, exists
 
 import json
 import pkgutil
+
+import leaderboard.db
+from leaderboard.db import session_factory
 
 class DB(object):
     instance = None
@@ -20,11 +24,12 @@ class DB(object):
 
         conn_tmpl = 'postgresql+pg8000://%(user)s:%(password)s@localhost/%(database)s'
         conn_str = conn_tmpl % jdata
-        self.engine = create_engine(conn_str, echo=True)
+        self.engine = create_engine(conn_str)
 
         self.Base = declarative_base(self.engine)
-        db_session = sessionmaker(bind=self.engine, expire_on_commit=False)
-        self.session = db_session()
+        self.session_factory = scoped_session(sessionmaker(bind=self.engine,
+                                              expire_on_commit=False,
+                                              autocommit=True))
 
     def _load_config(self, fpath):
         try:
@@ -54,18 +59,6 @@ class DB(object):
         inspector = Inspector.from_engine(get_db().engine)
         return name in inspector.get_table_names()
 
-    def commit(self):
-        self.session.commit()
-
-    def add(self, obj):
-        self.session.add(obj)
-
-    def get_session(self):
-        """
-        :rtype: Session
-        """
-        return self.session
-
     def get_metadata(self):
         return self.Base.metadata
 
@@ -80,8 +73,6 @@ class DB(object):
             CountryBounds.load_countries()
 
     def drop_all(self):
-        # endure session is committed
-        self.commit()
         from leaderboard.models.country_bounds import CountryBounds
         from leaderboard.models.user import User
         from leaderboard.models.tile import Tile
@@ -95,8 +86,10 @@ class DB(object):
                 get_db().engine.execute(tbl.delete())
                 tbl.drop(get_db().engine)
 
-        get_db().get_session().expunge_all()
-        get_db().get_session().expire_all()
+        session = session_factory()
+        with session.begin(subtransactions=True):
+            session.expunge_all()
+            session.expire_all()
 
 def get_db():
     """

@@ -1,16 +1,23 @@
 import falcon
 import json
 import route_endpoints.get_leaders
+from leaderboard import middleware
+from leaderboard.db import (
+    session_factory,
+    init_sessions
+)
 
 
 def crossdomain(req, resp):
     # review this
     resp.set_header('Access-Control-Allow-Origin', '*')
 
+
 class FetchLeaders:
     def on_get(self, req, resp):
         resp.content_type = "application/json"
         resp.body = json.dumps(route_endpoints.get_leaders_for_country(int(req.query_string)))
+
 
 class AddStumblesForUser:
     def on_post(self, req, resp):
@@ -26,13 +33,17 @@ class AddStumblesForUser:
             as_json = json.loads(raw_json, encoding='utf-8')
         except ValueError:
             raise falcon.HTTPError(falcon.HTTP_400,
-                  'Malformed JSON',
-                  'Could not decode the request body. The '
-                  'JSON was incorrect.')
+                                   'Malformed JSON',
+                                   'Could not decode the request body. The '
+                                   'JSON was incorrect.')
         # resp.status = falcon.HTTP_202 # or 200?
         route_endpoints.add_stumbles_for_user(email=None, login_token=None, query_json=as_json)
         # resp.body = json.dumps(add_stumbles_for_user(result_json), encoding='utf-8')
 
-app = falcon.API(after=[crossdomain])
+init_sessions()
+
+session_manager = middleware.SQLAlchemySessionManager(session_factory)
+app = falcon.API(middleware=[session_manager],
+                 after=[crossdomain])
 app.add_route('/leaders', FetchLeaders())
 app.add_route('/add_leaderboard_stumbles_for_user', AddStumblesForUser())

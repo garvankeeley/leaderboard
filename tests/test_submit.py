@@ -1,7 +1,8 @@
-from leaderboard.models.db import get_db
+from leaderboard.db import session_factory
 from leaderboard.models.user import User
 from leaderboard.models.calendar_factory import get_current_week_table_class
 from leaderboard.route_endpoints.submit_user_observations import add_stumbles_for_user
+from test_base import BaseTest
 
 canada_observations_json = '''
     [
@@ -10,14 +11,8 @@ canada_observations_json = '''
     ]
 '''
 
-class TestSubmit(object):
-    def setup(self):
-        get_db().drop_all()
-        get_db().create_all()
 
-    def teardown(self):
-        get_db().drop_all()
-
+class TestSubmit(BaseTest):
     def test_submit(self):
         user = create_one_user()
         submit_helper(canada_observations_json, user)
@@ -33,16 +28,19 @@ class TestSubmit(object):
         user = User()
         user.email = 'a@b.com'
         user.nickname = 'a'
-        get_db().add(user)
-        get_db().commit()
+
+        with self.session.begin():
+            self.session.add(user)
+
         ok = add_stumbles_for_user(user.email, user.bearer_token, "")
         assert not ok
         user.bearer_token = 'abc'
         ok = add_stumbles_for_user(user.email, 'cdf', "")
         assert not ok
-        get_db().commit()
 
 user_counter = 0
+
+
 def create_one_user():
     global user_counter
     user_counter += 1
@@ -50,10 +48,11 @@ def create_one_user():
     user.bearer_token = 'abc%d' % user_counter
     user.email = 'foo@foo.com%d' % user_counter
     user.nickname = 'nick%d' % user_counter
-    get_db().add(user)
-    get_db().commit()
+    session = session_factory()
+    with session.begin(subtransactions=True):
+        session.add(user)
     return user
+
 
 def submit_helper(json, user):
     add_stumbles_for_user(user.email, user.bearer_token, json)
-    get_db().commit()

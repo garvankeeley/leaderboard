@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship, backref
 from tile import Tile
 from user import User
 from db import get_db
+from leaderboard.db import session_factory
 
 
 def week_name_by_year_and_quarter_month():
@@ -66,23 +67,32 @@ def get_current_week_table_class():
 
 def get_week_table_for_user_and_tile(user, tile):
     Week = get_current_week_table_class()
-    return get_db().session.query(Week).filter(and_(Week.user == user, Week.tile == tile)).first()
+    session = session_factory()
+    with session.begin(subtransactions=True):
+        return session.query(Week).filter(and_(Week.user == user, Week.tile == tile)).first()
+
 
 
 def insert_or_update_week(user, tile):
+    """
+    This is ugly.  We should change this to use statically generated
+    tables.  The table creation should be avoided at runtime to just a
+    few discrete events so that we have a predictable schema.
+    """
     Week = get_current_week_table_class()
 
     db = get_db()
-    if not db.table_exists(Week.__tablename__):
-        db.get_metadata().create_all(get_db().engine)
-        db.session.commit()
+    session = session_factory()
+    with session.begin(subtransactions=True):
+        if not db.table_exists(Week.__tablename__):
+            db.get_metadata().create_all(db.engine)
 
-    existing = get_week_table_for_user_and_tile(user, tile)
-    if existing:
-        return existing
+        existing = get_week_table_for_user_and_tile(user, tile)
+        if existing:
+            return existing
 
-    w = Week()
-    w.user = user
-    w.tile = tile
-    db.get_session().add(w)
-    return w
+        w = Week()
+        w.user = user
+        w.tile = tile
+        session.add(w)
+        return w
