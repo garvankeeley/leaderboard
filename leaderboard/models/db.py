@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.reflection import Inspector
+from os.path import expanduser, join, exists
 
 import json
 import pkgutil
@@ -10,11 +11,12 @@ class DB(object):
     instance = None
 
     def __init__(self):
-        # Try to load the database connection from the configuration
-        # in the package, otherwise just use default connection
-        # params.
-        json_data = pkgutil.get_data('leaderboard', 'db_connection_params.json')
-        jdata = json.loads(json_data)
+        jdata = self.load_home_config()
+        if not jdata:
+            jdata = self.load_etc_config()
+
+        if not jdata:
+            raise RuntimeError("Can't load JSON configuration")
 
         conn_tmpl = 'postgresql+pg8000://%(user)s:%(password)s@localhost/%(database)s'
         conn_str = conn_tmpl % jdata
@@ -23,6 +25,30 @@ class DB(object):
         self.Base = declarative_base(self.engine)
         db_session = sessionmaker(bind=self.engine, expire_on_commit=False)
         self.session = db_session()
+
+    def _load_config(self, fpath):
+        try:
+            db_json = open(fpath)
+            if exists(fpath):
+                return json.load(db_json)
+        except:
+            return None
+
+    def load_etc_config(self):
+        """
+        Return the JSON blob from the /etc directory, or None if the
+        file can't be loaded.
+        """
+        fpath = '/etc/mozilla/stumbler_leaderboard/db.json'
+        return self._load_config(fpath)
+
+    def load_home_config(self):
+        """
+        Return the JSON blob from the home directory, or None if the
+        file can't be loaded.
+        """
+        fpath = join(expanduser("~"), ".stumbler_leaderboard", 'db.json')
+        return self._load_config(fpath)
 
     def table_exists(self, name):
         inspector = Inspector.from_engine(get_db().engine)
