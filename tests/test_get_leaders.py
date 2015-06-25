@@ -1,22 +1,15 @@
-from leaderboard.models.db import get_db
-from leaderboard.route_endpoints import get_leaders
 from leaderboard.route_endpoints.get_leaders import get_leaders_for_country
 
 import test_submit
 
+from test_base import BaseTest
 
-class TestLeaders(object):
-    def setup(self):
-        get_db().drop_all()
-        get_db().create_all()
 
-    def teardown(self):
-        get_db().drop_all()
+class TestLeaders(BaseTest):
 
     def test_leaders(self):
         user = test_submit.create_one_user()
         test_submit.submit_helper(test_submit.canada_observations_json, user)
-
         json = '''
             [
                 { "tile_easting_northing":"100,-700", "observations":200 },

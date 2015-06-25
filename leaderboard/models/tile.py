@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship, backref
 
 from leaderboard.geo_util import coord_sys as cs
 from leaderboard.models.db import get_db
+from leaderboard.db import session_factory
 from leaderboard.models.country_bounds import CountryBounds
 from leaderboard.geo_util import coord_utils
 
@@ -22,9 +23,10 @@ class Tile(get_db().Base):
         return cs.WEB_MERCATOR_CODE
 
     def geo_as_wgs84(self):
-        ewkt = "'" + get_db().engine.execute(func.ST_AsEWKT(self.geometry)).first().values()[0] + "'" + '::geometry'
+        session = session_factory()
+        ewkt = "'" + session.execute(func.ST_AsEWKT(self.geometry)).first().values()[0] + "'" + '::geometry'
         #select ST_Transform('SRID=3785;POLYGON((-8839000 5419000,-8839000 5419500,-8838500 5419500,-8838500 5419000,-8839000 5419000))', 4326);
-        r = get_db().engine.execute("select ST_AsEWKT(ST_Transform(%s, %d))" % (ewkt, cs.WGS84_LATLON_CODE))
+        r = session.execute("select ST_AsEWKT(ST_Transform(%s, %d))" % (ewkt, cs.WGS84_LATLON_CODE))
         return r.fetchone()[0]
 
     @staticmethod
@@ -34,15 +36,17 @@ class Tile(get_db().Base):
 
     @staticmethod
     def get_tile_mercator(easting, northing):
-        r = get_db().session.query(Tile).filter(func.ST_Contains(
-            Tile.geometry, func.ST_SetSRID(func.ST_Point(easting, northing), cs.WEB_MERCATOR_CODE))).first()
-        if r:
-            return r
+        session = session_factory()
+        with session.begin(subtransactions=True):
+            r = session.query(Tile).filter(func.ST_Contains(
+                Tile.geometry, func.ST_SetSRID(func.ST_Point(easting, northing), cs.WEB_MERCATOR_CODE))).first()
+            if r:
+                return r
+
         ewkt = Tile.create_tile_ewkt_mercator(easting, northing)
         tile = Tile()
         tile.geometry = ewkt
         CountryBounds.set_country_for_tile(tile)
-        get_db().commit()
         return tile
 
     @staticmethod
