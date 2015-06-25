@@ -52,7 +52,7 @@ def get_engine(uri):
         'echo': False,
     }
     options['connect_args'] = {'charset': 'utf8'}
-    options['execution_options'] = {'autocommit': False}
+    options['execution_options'] = {'autocommit': True}
     return create_engine(uri, **options)
 
 session_factory = scoped_session(sessionmaker(expire_on_commit=False,
