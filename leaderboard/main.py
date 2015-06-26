@@ -46,4 +46,4 @@ session_manager = middleware.SQLAlchemySessionManager(session_factory)
 app = falcon.API(middleware=[session_manager],
                  after=[crossdomain])
 app.add_route('/leaders', FetchLeaders())
-app.add_route('/add_leaderboard_stumbles_for_user', AddStumblesForUser())
+app.add_route('/add_stumbles', AddStumblesForUser())
