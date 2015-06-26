@@ -8,6 +8,8 @@ from leaderboard.db import (
 )
 
 
+BEARER_TOKEN_HEADER = 'Authorization'
+
 def crossdomain(req, resp):
     # review this
     resp.set_header('Access-Control-Allow-Origin', '*')
@@ -19,11 +21,24 @@ class FetchLeaders:
         resp.body = json.dumps(route_endpoints.get_leaders_for_country(int(req.query_string)))
 
 
+def token_ok(request):
+    try:
+        token = req.get_header(BEARER_TOKEN_HEADER, '')
+        if token.startswith('Bearer '):
+            token = token.replace('Bearer ', '')
+            # TODO: check the validity of the token against the
+            # profile server
+            return True
+    except:
+        return False
+
 class AddStumblesForUser:
     def on_post(self, req, resp):
         resp.content_type = 'application/json'
-        req.get_header('bearer_token')
-        # resp.body = json.dumps(
+        
+        if not token_ok(req):
+            raise falcon.HTTPError(falcon.HTTP_403, 'Unauthorized submission')
+
         try:
             raw_json = req.stream.read()
         except Exception as ex:
