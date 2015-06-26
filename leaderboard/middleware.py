@@ -7,16 +7,36 @@ class SQLAlchemySessionManager(object):
         self._scoped = isinstance(session_factory, scoping.ScopedSession)
         self._auto_commit = auto_commit
 
-    def process_request(self, req, resp, params):
+    def process_request(self, req, resp, resource=None):
+        """
+        Post-processing of the response (after routing).
+
+        Args:
+            req: Request object.
+            resp: Response object.
+            resource: Resource object to which the request was
+                routed. May be None if no route was found
+                for the request.
+        """
         req.context['session'] = self._session_factory()
 
-    def process_response(self, req, resp):
+    def process_response(self, req, resp, resource=None):
+        """
+        Post-processing of the response (after routing).
+
+        Args:
+            req: Request object.
+            resp: Response object.
+            resource: Resource object to which the request was
+                routed. May be None if no route was found
+                for the request.
+        """
         session = req.context['session']
 
         if self._auto_commit:
             session.commit()
 
         if self._scoped:
-            session.remove()
+            session.rollback()
         else:
             session.close()

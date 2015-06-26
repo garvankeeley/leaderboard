@@ -1,6 +1,6 @@
 import falcon
 import json
-import route_endpoints.get_leaders
+from leaderboard.route_endpoints import get_leaders
 from leaderboard import middleware
 from leaderboard.db import (
     session_factory,
@@ -16,7 +16,7 @@ def crossdomain(req, resp):
 class FetchLeaders:
     def on_get(self, req, resp):
         resp.content_type = "application/json"
-        resp.body = json.dumps(route_endpoints.get_leaders_for_country(int(req.query_string)))
+        resp.body = json.dumps(get_leaders.get_leaders_for_country(int(req.query_string)))
 
 
 class AddStumblesForUser:
