@@ -1,6 +1,7 @@
 import falcon
 import json
 from leaderboard.route_endpoints import get_leaders
+from leaderboard import route_endpoints
 from leaderboard import middleware
 from leaderboard.db import (
     session_factory,
@@ -21,15 +22,14 @@ class FetchLeaders:
         resp.body = json.dumps(get_leaders.get_leaders_for_country(int(req.query_string)))
 
 
-def token_ok(request):
-    try:
-        token = req.get_header(BEARER_TOKEN_HEADER, '')
-        if token.startswith('Bearer '):
-            token = token.replace('Bearer ', '')
-            # TODO: check the validity of the token against the
-            # profile server
-            return True
-    except:
+def token_ok(req):
+    token = req.get_header(BEARER_TOKEN_HEADER, '')
+    if token.startswith('Bearer'):
+        token = token.replace('Bearer ', '')
+        # TODO: check the validity of the token against the
+        # profile server
+        return True
+    else:
         return False
 
 class AddStumblesForUser:
@@ -37,7 +37,9 @@ class AddStumblesForUser:
         resp.content_type = 'application/json'
         
         if not token_ok(req):
-            raise falcon.HTTPError(falcon.HTTP_403, 'Unauthorized submission')
+            token = req.get_header(BEARER_TOKEN_HEADER, '')
+            msg = 'Unauthorized submission [%s]' % token
+            raise falcon.HTTPError(falcon.HTTP_403, msg)
 
         try:
             raw_json = req.stream.read()
