@@ -22,7 +22,8 @@ def get_leaders_for_country(country_id):
 
     rows = []
     for row in result:
-        rows.append({'name': row[0].nickname, 'observations': row[1]})
+        rows.append({'name': row[0].nickname,
+                     'observations': str(row[1])})
 
     country_name = session.query(country_bounds.CountryBounds.name).\
         filter_by(ogc_fid=country_id).first()
