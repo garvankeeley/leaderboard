@@ -1,5 +1,6 @@
 import falcon
 import json
+from leaderboard.util.gz_compress import gzip_decompress
 from leaderboard.route_endpoints import get_leaders
 from leaderboard import route_endpoints
 from leaderboard.fxa import FxaProfileServer
@@ -66,10 +67,11 @@ class AddStumblesForContributor:
                                    'Could not decode the request body. The '
                                    'JSON was incorrect.')
         # resp.status = falcon.HTTP_202 # or 200?
+        unzipped = gzip_decompress(as_json)
         route_endpoints.add_stumbles_for_contributor(email=email,
                                               displayName=nick,
                                               login_token=token,
-                                              query_json=as_json)
+                                              query_json=unzipped)
 
 init_sessions()
 
