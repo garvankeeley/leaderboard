@@ -61,7 +61,9 @@ session_factory = scoped_session(sessionmaker(expire_on_commit=False,
 
 def init_sessions():
     # Setup the global database engine and session manager
-    engine = get_engine(conn_str())
+    dsn = conn_str()
+    print "Connecting to: %s" % dsn
+    engine = get_engine(dsn)
     session_factory.configure(bind=engine)
 
     # TODO: this is terrible - fix this

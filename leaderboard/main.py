@@ -72,5 +72,10 @@ init_sessions()
 session_manager = middleware.SQLAlchemySessionManager(session_factory)
 app = falcon.API(middleware=[session_manager],
                  after=[crossdomain])
-app.add_route('/leaders', FetchLeaders())
-app.add_route('/add_stumbles', AddStumblesForContributor())
+app.add_route('/backend/leaders', FetchLeaders())
+app.add_route('/backend/add_stumbles', AddStumblesForContributor())
+
+if __name__ == '__main__':
+    from wsgiref import simple_server
+    httpd = simple_server.make_server('127.0.0.1', 8050, app)
+    httpd.serve_forever()
