@@ -45,6 +45,8 @@ class AddStumblesForContributor:
             return None
 
     def on_post(self, req, resp):
+        import pdb
+        pdb.set_trace()
         resp.content_type = 'application/json'
         token_resp = self.token_ok(req)
         if token_resp is None:
@@ -55,11 +57,12 @@ class AddStumblesForContributor:
         token, email, nick = token_resp
 
         try:
-            raw_json = req.stream.read()
+            raw_bytes = req.stream.read()
         except Exception as ex:
             raise falcon.HTTPError(falcon.HTTP_400, 'Error', ex.message)
 
         try:
+            raw_json = gzip_decompress(raw_bytes)
             as_json = json.loads(raw_json, encoding='utf-8')
         except ValueError:
             raise falcon.HTTPError(falcon.HTTP_400,
@@ -67,11 +70,10 @@ class AddStumblesForContributor:
                                    'Could not decode the request body. The '
                                    'JSON was incorrect.')
         # resp.status = falcon.HTTP_202 # or 200?
-        unzipped = gzip_decompress(as_json)
         route_endpoints.add_stumbles_for_contributor(email=email,
-                                              displayName=nick,
+                                              display_name=nick,
                                               login_token=token,
-                                              query_json=unzipped)
+                                              query_json=as_json)
 
 init_sessions()
 
