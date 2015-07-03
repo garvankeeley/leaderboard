@@ -1,13 +1,13 @@
 from geoalchemy2 import Geometry, func
 from sqlalchemy import Column, Integer, String
 from leaderboard.geo_util import coord_sys as cs
-from leaderboard.db import session_factory
+from leaderboard.db import session_factory, Base
 from leaderboard.geo_util.coord_sys import WGS84_LATLON_CODE
 from leaderboard.models.db import get_db
 
 creation_command = 'ogr2ogr -f PostgreSQL PG:"port=5432" *.geo.json -nln country_bounds'
 
-class CountryBounds(get_db().Base):
+class CountryBounds(Base):
     __tablename__ = 'country_bounds'
     ogc_fid = Column(Integer, primary_key=True)
     wkb_geometry = Column(Geometry(geometry_type='Geometry', srid=cs.WGS84_LATLON_CODE))

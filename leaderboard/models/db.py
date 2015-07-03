@@ -1,15 +1,13 @@
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.reflection import Inspector
+from leaderboard.db import engine, Base
 from os.path import expanduser, join, exists
 
 import json
-import pkgutil
 
-import leaderboard.db
 from leaderboard.db import session_factory
+
 
 class DB(object):
     instance = None
@@ -22,11 +20,8 @@ class DB(object):
         if not jdata:
             raise RuntimeError("Can't load JSON configuration")
 
-        conn_tmpl = 'postgresql+pg8000://%(user)s:%(password)s@localhost/%(database)s'
-        conn_str = conn_tmpl % jdata
-        self.engine = create_engine(conn_str)
+        self.engine = engine
 
-        self.Base = declarative_base(self.engine)
         self.session_factory = scoped_session(sessionmaker(bind=self.engine,
                                               expire_on_commit=False,
                                               autocommit=True))
@@ -60,12 +55,12 @@ class DB(object):
         return name in inspector.get_table_names()
 
     def get_metadata(self):
-        return self.Base.metadata
+        return Base.metadata
 
     def create_all(self):
-        from leaderboard.models.country_bounds import CountryBounds
-        from leaderboard.models.contributor import Contributor
-        from leaderboard.models.tile import Tile
+        from leaderboard.models.country_bounds import CountryBounds  # NOQA
+        from leaderboard.models.contributor import Contributor       # NOQA
+        from leaderboard.models.tile import Tile    # NOQA
         do_load = not self.table_exists(CountryBounds.__tablename__)
         self.get_metadata().create_all(self.engine)
 
@@ -73,9 +68,9 @@ class DB(object):
             CountryBounds.load_countries()
 
     def drop_all(self):
-        from leaderboard.models.country_bounds import CountryBounds
-        from leaderboard.models.contributor import Contributor
-        from leaderboard.models.tile import Tile
+        from leaderboard.models.country_bounds import CountryBounds  # NOQA
+        from leaderboard.models.contributor import Contributor  # NOQA
+        from leaderboard.models.tile import Tile   # NOQA
         from leaderboard.models.calendar_report_factory import get_current_quartermonth_table_class
         wk = get_current_quartermonth_table_class()
         if self.table_exists(wk.__tablename__):
@@ -90,6 +85,7 @@ class DB(object):
         with session.begin(subtransactions=True):
             session.expunge_all()
             session.expire_all()
+
 
 def get_db():
     """

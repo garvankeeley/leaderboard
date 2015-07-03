@@ -6,6 +6,7 @@ from sqlalchemy import (
 )
 
 from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.ext.declarative import declarative_base
 
 
 def conn_str():
@@ -58,12 +59,12 @@ def get_engine(uri):
 session_factory = scoped_session(sessionmaker(expire_on_commit=False,
                                               autocommit=True))
 
+dsn = conn_str()
+engine = get_engine(dsn)
+Base = declarative_base(engine)
 
 def init_sessions():
     # Setup the global database engine and session manager
-    dsn = conn_str()
-    print "Connecting to: %s" % dsn
-    engine = get_engine(dsn)
     session_factory.configure(bind=engine)
 
     # TODO: this is terrible - fix this

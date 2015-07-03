@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, backref
 from tile import Tile
 from contributor import Contributor
 from db import get_db
-from leaderboard.db import session_factory
+from leaderboard.db import session_factory, Base
 
 
 def quartermonth_name_by_year_and_quarter_month():
@@ -53,7 +53,7 @@ def get_quartermonth_table_class(quartermonth_name=None):
 
         observation_count = Column(BigInteger)
 
-    class QuarterMonth(get_db().Base, CalenderReportPerContributorAndTile):
+    class QuarterMonth(Base, CalenderReportPerContributorAndTile):
         tile = relationship(Tile)
         contributor = relationship(Contributor, backref=backref(tablename + 's'))
 
