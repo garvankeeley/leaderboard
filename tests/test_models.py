@@ -22,17 +22,17 @@ class TestModels(BaseTest):
             assert isinstance(item, CountryBounds)
             return item
 
-    def test_add_user_tile_and_report(self):
+    def test_add_contributor_tile_and_report(self):
         with self.session.begin(subtransactions=True):
-            user = Contributor()
-            user.nickname = 'nick'
+            contributor = Contributor()
+            contributor.nickname = 'nick'
 
             tile = Tile()
 
-            self.session.add(user)
+            self.session.add(contributor)
             self.session.add(tile)
 
-            calendar_factory.insert_or_update_week(user, tile)
+            calendar_factory.insert_or_update_week(contributor, tile)
 
     def test_add_tile_for_coord(self):
         with self.session.begin(subtransactions=True):

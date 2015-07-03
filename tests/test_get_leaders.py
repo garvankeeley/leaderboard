@@ -9,8 +9,8 @@ from nose.tools import eq_
 class TestLeaders(BaseTest):
 
     def test_leaders(self):
-        user = test_submit.create_one_user()
-        test_submit.submit_helper(test_submit.canada_observations_json, user)
+        contributor = test_submit.create_one_contributor()
+        test_submit.submit_helper(test_submit.canada_observations_json, contributor)
         json = '''
             [
                 { "tile_easting_northing":"100,-700", "observations":200 },
@@ -18,18 +18,18 @@ class TestLeaders(BaseTest):
             ]
         '''
 
-        test_submit.submit_helper(json, user)
+        test_submit.submit_helper(json, contributor)
         result = get_leaders_for_country(29)
         assert result
         row0 = result['leaders'][0]
-        eq_(row0['name'], user.nickname)
+        eq_(row0['name'], contributor.nickname)
         eq_(row0['observations'], str(101))
 
-        user2 = test_submit.create_one_user()
-        test_submit.submit_helper(test_submit.canada_observations_json, user2)
-        test_submit.submit_helper(test_submit.canada_observations_json, user2)
+        contributor2 = test_submit.create_one_contributor()
+        test_submit.submit_helper(test_submit.canada_observations_json, contributor2)
+        test_submit.submit_helper(test_submit.canada_observations_json, contributor2)
         result = get_leaders_for_country(29)
         assert result
         row0 = result['leaders'][0]
-        eq_(row0['name'], user2.nickname)
+        eq_(row0['name'], contributor2.nickname)
         eq_(row0['observations'], str(202))

@@ -26,7 +26,7 @@ class FetchLeaders:
         resp.body = json.dumps(json_obj)
 
 
-class AddStumblesForUser:
+class AddStumblesForContributor:
     def token_ok(self, req):
         token = req.get_header(BEARER_TOKEN_HEADER, '')
         if token.startswith('Bearer'):
@@ -62,7 +62,7 @@ class AddStumblesForUser:
                                    'Could not decode the request body. The '
                                    'JSON was incorrect.')
         # resp.status = falcon.HTTP_202 # or 200?
-        route_endpoints.add_stumbles_for_user(email=email,
+        route_endpoints.add_stumbles_for_contributor(email=email,
                                               displayName=nick,
                                               login_token=token,
                                               query_json=as_json)
@@ -73,4 +73,4 @@ session_manager = middleware.SQLAlchemySessionManager(session_factory)
 app = falcon.API(middleware=[session_manager],
                  after=[crossdomain])
 app.add_route('/leaders', FetchLeaders())
-app.add_route('/add_stumbles', AddStumblesForUser())
+app.add_route('/add_stumbles', AddStumblesForContributor())

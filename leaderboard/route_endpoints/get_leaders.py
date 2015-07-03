@@ -11,7 +11,7 @@ def get_leaders_for_country(country_id):
     q = session.query(contributor.Contributor,
                       func.sum(Week.observation_count).label('obs_sum')).\
                       filter(tile.Tile.country_id == country_id).\
-                      filter(Week.user_id == contributor.Contributor.id).\
+                      filter(Week.contributor_id == contributor.Contributor.id).\
                       filter(Week.tile_id == tile.Tile.id).\
                       group_by(contributor.Contributor.id).\
                       order_by(desc('obs_sum'))

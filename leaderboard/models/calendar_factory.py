@@ -33,29 +33,29 @@ __week_classes = {}
 
 def get_week_table_class(week_name=None):
     if not week_name:
-        week_name == week_name_by_year_and_quarter_month()
+        week_name = week_name_by_year_and_quarter_month()
 
     tablename = 'week%s' % week_name
     if tablename in __week_classes:
         return __week_classes[tablename]
 
-    class CalenderReportPerUserAndTile(object):
+    class CalenderReportPerContributorAndTile(object):
         __tablename__ = tablename
         id = Column(Integer, primary_key=True)
 
         @declared_attr
-        def user_id(cls):
-            return Column(Integer, ForeignKey('user.id'))
+        def contributor_id(cls):
+            return Column(Integer, ForeignKey(Contributor.id))
 
         @declared_attr
         def tile_id(cls):
-            return Column(Integer, ForeignKey('tile.id'))
+            return Column(Integer, ForeignKey(Tile.id))
 
         observation_count = Column(BigInteger)
 
-    class Week(get_db().Base, CalenderReportPerUserAndTile):
+    class Week(get_db().Base, CalenderReportPerContributorAndTile):
         tile = relationship(Tile)
-        user = relationship(Contributor, backref=backref(tablename + 's'))
+        contributor = relationship(Contributor, backref=backref(tablename + 's'))
 
     __week_classes[tablename] = Week
     return Week
@@ -65,15 +65,15 @@ def get_current_week_table_class():
     week_class = get_week_table_class(None)
     return week_class
 
-def get_week_table_for_user_and_tile(user, tile):
+def get_week_table_for_contributor_and_tile(contributor, tile):
     Week = get_current_week_table_class()
     session = session_factory()
     with session.begin(subtransactions=True):
-        return session.query(Week).filter(and_(Week.user == user, Week.tile == tile)).first()
+        return session.query(Week).filter(and_(Week.contributor == contributor, Week.tile == tile)).first()
 
 
 
-def insert_or_update_week(user, tile):
+def insert_or_update_week(contributor, tile):
     """
     This is ugly.  We should change this to use statically generated
     tables.  The table creation should be avoided at runtime to just a
@@ -87,12 +87,12 @@ def insert_or_update_week(user, tile):
         if not db.table_exists(Week.__tablename__):
             db.get_metadata().create_all(db.engine)
 
-        existing = get_week_table_for_user_and_tile(user, tile)
+        existing = get_week_table_for_contributor_and_tile(contributor, tile)
         if existing:
             return existing
 
         w = Week()
-        w.user = user
+        w.contributor = contributor
         w.tile = tile
         session.add(w)
         return w
