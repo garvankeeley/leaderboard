@@ -1,8 +1,7 @@
 from sqlalchemy import Column, BigInteger, Integer, String
 from db import get_db
 
-
-class User(get_db().Base):
+class Contributor(get_db().Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     # nickname should be unique?

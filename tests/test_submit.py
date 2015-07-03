@@ -1,5 +1,5 @@
 from leaderboard.db import session_factory
-from leaderboard.models.user import User
+from leaderboard.models.contributor import Contributor
 from leaderboard.models.calendar_factory import get_current_week_table_class
 from leaderboard.route_endpoints.submit_user_observations import add_stumbles_for_user
 from test_base import BaseTest
@@ -47,7 +47,7 @@ class TestSubmit(BaseTest):
 
 
     def test_bad_token(self):
-        user = User()
+        user = Contributor()
         user.email = 'a@b.com'
         user.nickname = 'a'
 
@@ -68,7 +68,7 @@ user_counter = 0
 def create_one_user():
     global user_counter
     user_counter += 1
-    user = User()
+    user = Contributor()
     user.bearer_token = 'abc%d' % user_counter
     user.email = 'foo@foo.com%d' % user_counter
     user.nickname = 'nick%d' % user_counter

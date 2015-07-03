@@ -2,7 +2,7 @@ import math
 
 from leaderboard.models.country_bounds import CountryBounds
 from leaderboard.geo_util import coord_utils
-from leaderboard.models.user import User
+from leaderboard.models.contributor import Contributor
 from leaderboard.models.tile import Tile
 from leaderboard.models import calendar_factory
 from test_base import BaseTest
@@ -24,7 +24,7 @@ class TestModels(BaseTest):
 
     def test_add_user_tile_and_report(self):
         with self.session.begin(subtransactions=True):
-            user = User()
+            user = Contributor()
             user.nickname = 'nick'
 
             tile = Tile()

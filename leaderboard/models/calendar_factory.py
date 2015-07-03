@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import Column, Integer, ForeignKey, BigInteger, and_
 from sqlalchemy.orm import relationship, backref
 from tile import Tile
-from user import User
+from contributor import Contributor
 from db import get_db
 from leaderboard.db import session_factory
 
@@ -55,7 +55,7 @@ def get_week_table_class(week_name=None):
 
     class Week(get_db().Base, CalenderReportPerUserAndTile):
         tile = relationship(Tile)
-        user = relationship(User, backref=backref(tablename + 's'))
+        user = relationship(Contributor, backref=backref(tablename + 's'))
 
     __week_classes[tablename] = Week
     return Week

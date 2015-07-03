@@ -64,7 +64,7 @@ class DB(object):
 
     def create_all(self):
         from leaderboard.models.country_bounds import CountryBounds
-        from leaderboard.models.user import User
+        from leaderboard.models.contributor import Contributor
         from leaderboard.models.tile import Tile
         do_load = not self.table_exists(CountryBounds.__tablename__)
         self.get_metadata().create_all(self.engine)
@@ -74,7 +74,7 @@ class DB(object):
 
     def drop_all(self):
         from leaderboard.models.country_bounds import CountryBounds
-        from leaderboard.models.user import User
+        from leaderboard.models.contributor import Contributor
         from leaderboard.models.tile import Tile
         from leaderboard.models.calendar_factory import get_current_week_table_class
         wk = get_current_week_table_class()

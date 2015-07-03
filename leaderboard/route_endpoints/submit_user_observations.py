@@ -1,7 +1,7 @@
 import json
 from leaderboard.db import session_factory
 from leaderboard.models.tile import Tile
-from leaderboard.models.user import User
+from leaderboard.models.contributor import Contributor
 from leaderboard.models.calendar_factory import insert_or_update_week
 key_tile_easting_northing = 'tile_easting_northing'
 key_observations = 'observations'
@@ -10,7 +10,7 @@ key_observations = 'observations'
 def add_stumbles_for_user(email, display_name, login_token, query_json):
     session = session_factory()
     with session.begin(subtransactions=True):
-        user = session.query(User).filter_by(email=email).first()
+        user = session.query(Contributor).filter_by(email=email).first()
         if user.nickname != display_name:
             user.nickname = display_name
             session.add(user)
