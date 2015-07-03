@@ -6,12 +6,12 @@ from sqlalchemy.orm import relationship, backref
 
 from leaderboard.geo_util import coord_sys as cs
 from leaderboard.models.db import get_db
-from leaderboard.db import session_factory
+from leaderboard.db import session_factory, Base
 from leaderboard.models.country_bounds import CountryBounds
 from leaderboard.geo_util import coord_utils
 
 
-class Tile(get_db().Base):
+class Tile(Base):
     __tablename__ = 'tile'
     id = Column(BigInteger, primary_key=True)
     country_id = Column(Integer, ForeignKey('country_bounds.ogc_fid'))

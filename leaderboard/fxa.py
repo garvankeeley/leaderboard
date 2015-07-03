@@ -7,7 +7,7 @@ class FxaProfileServer(object):
     def __init__(self):
         # TODO: this needs to be repointed to the production server in
         # a config object or something.
-        self.fxa_url = DEV_PROFILE_SERVER
+        self.fxa_url = self.DEV_PROFILE_SERVER
 
 
     def fetch_profile(self, bearer_token):

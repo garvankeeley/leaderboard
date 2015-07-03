@@ -13,6 +13,8 @@ canada_observations_json = '''
 '''
 
 
+BEARER_TOKEN = 'abc'
+
 class TestSubmit(BaseTest):
     def test_submit(self):
         contributor = create_one_contributor()
@@ -33,7 +35,8 @@ class TestSubmit(BaseTest):
             session.add(contributor)
             nick = contributor.nickname
         nickname = time.time()
-        add_stumbles_for_contributor(contributor.email, nickname, contributor.bearer_token, canada_observations_json)
+        add_stumbles_for_contributor(contributor.email, nickname,
+                BEARER_TOKEN, canada_observations_json)
         # check contributor has 1 tile, 1 weekX row, and total obs is 101
         weekly_per_tile = contributor.get_reports_weekly()
         eq_(len(weekly_per_tile), 1)
@@ -46,22 +49,6 @@ class TestSubmit(BaseTest):
         eq_(contributor.nickname, nickname)
 
 
-    def test_bad_token(self):
-        contributor = Contributor()
-        contributor.email = 'a@b.com'
-        contributor.nickname = 'a'
-
-        with self.session.begin():
-            self.session.add(contributor)
-
-        args = contributor.email, contributor.nickname, contributor.bearer_token, ""
-        ok = add_stumbles_for_contributor(*args)
-        assert not ok
-        contributor.bearer_token = 'abc'
-        args = contributor.email, contributor.nickname, 'cdf', ""
-        ok = add_stumbles_for_contributor(*args)
-        assert not ok
-
 contributor_counter = 0
 
 
@@ -69,7 +56,6 @@ def create_one_contributor():
     global contributor_counter
     contributor_counter += 1
     contributor = Contributor()
-    contributor.bearer_token = 'abc%d' % contributor_counter
     contributor.email = 'foo@foo.com%d' % contributor_counter
     contributor.nickname = 'nick%d' % contributor_counter
     session = session_factory()
@@ -79,4 +65,4 @@ def create_one_contributor():
 
 
 def submit_helper(json, contributor):
-    add_stumbles_for_contributor(contributor.email, contributor.nickname, contributor.bearer_token, json)
+    add_stumbles_for_contributor(contributor.email, contributor.nickname, BEARER_TOKEN, json)
