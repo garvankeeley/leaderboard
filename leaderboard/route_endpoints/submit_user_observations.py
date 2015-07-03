@@ -1,5 +1,4 @@
 import json
-import time
 from leaderboard.db import session_factory
 from leaderboard.models.tile import Tile
 from leaderboard.models.user import User
@@ -14,7 +13,6 @@ def add_stumbles_for_user(email, displayName, login_token, query_json):
         user = session.query(User).filter_by(email=email).first()
         if user.nickname != displayName:
             user.nickname = displayName
-            user.last_update = time.time()
             session.add(user)
 
         if not user:

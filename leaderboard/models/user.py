@@ -8,7 +8,6 @@ class User(get_db().Base):
     # nickname should be unique?
     nickname = Column(String, nullable=False)
     email = Column(String)
-    last_update = Column(BigInteger, default=0)
     bearer_token = Column(String)
 
     def get_reports_weekly(self):
