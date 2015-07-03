@@ -1,4 +1,5 @@
 import requests
+import json
 
 class FxaProfileServer(object):
     PROD_PROFILE_SERVER = "https://profile.accounts.firefox.com/v1/profile"
@@ -28,7 +29,7 @@ class FxaProfileServer(object):
         headers = {'Authorization': 'Bearer %s' % bearer_token}
 
         try:
-            r = requests.get(self.fxa_url, headers=headers)
+            r = requests.get(self.fxa_url + "/profile", headers=headers)
             json_response = r.text
             jdata = json.loads(json_response)
             email_address = jdata.get('email', '')
