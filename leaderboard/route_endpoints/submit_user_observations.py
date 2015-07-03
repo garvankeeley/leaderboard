@@ -7,10 +7,13 @@ key_tile_easting_northing = 'tile_easting_northing'
 key_observations = 'observations'
 
 
-def add_stumbles_for_user(email, login_token, query_json):
+def add_stumbles_for_user(email, display_name, login_token, query_json):
     session = session_factory()
     with session.begin(subtransactions=True):
         user = session.query(User).filter_by(email=email).first()
+        if user.nickname != display_name:
+            user.nickname = display_name
+            session.add(user)
 
         if not user:
             return False
