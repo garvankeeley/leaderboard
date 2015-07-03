@@ -2,6 +2,7 @@ from geoalchemy2 import Geometry, func
 from sqlalchemy import Column, Integer, String
 from leaderboard.geo_util import coord_sys as cs
 from leaderboard.db import session_factory
+from leaderboard.geo_util.coord_sys import WGS84_LATLON_CODE
 from leaderboard.models.db import get_db
 
 creation_command = 'ogr2ogr -f PostgreSQL PG:"port=5432" *.geo.json -nln country_bounds'
@@ -27,7 +28,7 @@ class CountryBounds(get_db().Base):
         ds = drv.Open(infile)
         layer = ds.GetLayer(0)
         srs = ogr.osr.SpatialReference()
-        srs.ImportFromEPSG(4326)
+        srs.ImportFromEPSG(WGS84_LATLON_CODE)
         session = session_factory()
         with session.begin(subtransactions=True):
             for feature in layer:
@@ -58,7 +59,6 @@ class CountryBounds(get_db().Base):
             if not c or use_nearby:
                 # https://github.com/geoalchemy/geoalchemy2/issues/94 broken <->
                 # also doesn't work SELECT ogc_fid FROM country_bounds ORDER BY wkb_geometry <-> ST_Centroid('%s') LIMIT 1
-                result = session.query(CountryBounds)
                 nearby = '''
                     WITH index_query AS (
                       SELECT ST_Distance(wkb_geometry, '%s') as d, name, ogc_fid

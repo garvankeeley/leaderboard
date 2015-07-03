@@ -76,8 +76,8 @@ class DB(object):
         from leaderboard.models.country_bounds import CountryBounds
         from leaderboard.models.contributor import Contributor
         from leaderboard.models.tile import Tile
-        from leaderboard.models.calendar_factory import get_current_week_table_class
-        wk = get_current_week_table_class()
+        from leaderboard.models.calendar_report_factory import get_current_quartermonth_table_class
+        wk = get_current_quartermonth_table_class()
         if self.table_exists(wk.__tablename__):
             t = wk.__table__
             t.drop(get_db().engine)
