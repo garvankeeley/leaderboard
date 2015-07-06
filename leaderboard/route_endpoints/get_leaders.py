@@ -1,18 +1,18 @@
 from decimal import Decimal
 from geoalchemy2 import func
-from leaderboard.models import calendar_report_factory, db, contributor, tile, country_bounds
+from leaderboard.models import reportweeks, contributor, tile, country_bounds
 from leaderboard.db import session_factory
 from sqlalchemy import desc
 
 
 def get_leaders_for_country(country_id):
-    QuarterMonth = calendar_report_factory.get_current_quartermonth_table_class()
+    week_class = reportweeks.get_current_reportweek_class()
     session = session_factory()
     q = session.query(contributor.Contributor,
-                      func.sum(QuarterMonth.observation_count).label('obs_sum')).\
+                      func.sum(week_class.observation_count).label('obs_sum')).\
                       filter(tile.Tile.country_id == country_id).\
-                      filter(QuarterMonth.contributor_id == contributor.Contributor.id).\
-                      filter(QuarterMonth.tile_id == tile.Tile.id).\
+                      filter(week_class.contributor_id == contributor.Contributor.id).\
+                      filter(week_class.tile_id == tile.Tile.id).\
                       group_by(contributor.Contributor.id).\
                       order_by(desc('obs_sum'))
     result = q.all()

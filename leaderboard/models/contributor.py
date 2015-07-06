@@ -10,6 +10,6 @@ class Contributor(Base):
     email = Column(String)
 
     def get_reports_weekly(self):
-        from leaderboard.models.calendar_report_factory import get_current_quartermonth_table_class
-        weeks = getattr(self, '%ss' % get_current_quartermonth_table_class().__tablename__)
+        from leaderboard.models.reportweeks import get_current_reportweek_class
+        weeks = getattr(self, '%ss' % get_current_reportweek_class().__tablename__)
         return weeks

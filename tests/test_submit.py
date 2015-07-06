@@ -1,6 +1,6 @@
 from leaderboard.db import session_factory
 from leaderboard.models.contributor import Contributor
-from leaderboard.models.calendar_report_factory import get_current_quartermonth_table_class
+from leaderboard.models.reportweeks import get_current_reportweek_class
 from leaderboard.route_endpoints.submit_contributor_observations import add_stumbles_for_contributor
 from test_base import BaseTest
 from nose.tools import eq_
@@ -23,7 +23,7 @@ class TestSubmit(BaseTest):
         weekly_per_tile = contributor.get_reports_weekly()
         eq_(len(weekly_per_tile), 1)
         single_week = weekly_per_tile[0]
-        assert isinstance(single_week, get_current_quartermonth_table_class())
+        assert isinstance(single_week, get_current_reportweek_class())
         eq_(single_week.observation_count, 101)
         eq_(single_week.tile.country.name.lower(), 'canada')
 
@@ -36,12 +36,12 @@ class TestSubmit(BaseTest):
             nick = contributor.nickname
         nickname = time.time()
         add_stumbles_for_contributor(contributor.email, nickname,
-                BEARER_TOKEN, canada_observations_json)
+                canada_observations_json)
         # check contributor has 1 tile, 1 weekX row, and total obs is 101
         weekly_per_tile = contributor.get_reports_weekly()
         eq_(len(weekly_per_tile), 1)
         single_week = weekly_per_tile[0]
-        assert isinstance(single_week, get_current_quartermonth_table_class())
+        assert isinstance(single_week, get_current_reportweek_class())
         eq_(single_week.observation_count, 101)
         eq_(single_week.tile.country.name.lower(), 'canada')
 
@@ -65,4 +65,4 @@ def create_one_contributor():
 
 
 def submit_helper(json, contributor):
-    add_stumbles_for_contributor(contributor.email, contributor.nickname, BEARER_TOKEN, json)
+    add_stumbles_for_contributor(contributor.email, contributor.nickname, json)

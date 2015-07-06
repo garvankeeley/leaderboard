@@ -70,7 +70,6 @@ class AddStumblesForContributor:
         # resp.status = falcon.HTTP_202 # or 200?
         route_endpoints.add_stumbles_for_contributor(email=email,
                                               display_name=nick,
-                                              login_token=token,
                                               query_json=as_json)
 
 init_sessions()
