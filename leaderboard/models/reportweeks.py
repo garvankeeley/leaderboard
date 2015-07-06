@@ -15,6 +15,10 @@ def current_week_number():
     return datetime.datetime.now().isocalendar()[1]
 
 
+def max_week_in_year():
+    return datetime.date(datetime.date.today().year, 12, 31).isocalendar()[1]
+
+
 _week_classes_cache = {}
 
 
