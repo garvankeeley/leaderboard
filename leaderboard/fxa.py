@@ -1,6 +1,7 @@
 import requests
 import json
 
+
 class FxaProfileServer(object):
     PROD_PROFILE_SERVER = "https://profile.accounts.firefox.com/v1/profile"
     DEV_PROFILE_SERVER = "https://stable.dev.lcip.org/profile/v1"
@@ -10,9 +11,8 @@ class FxaProfileServer(object):
         # a config object or something.
         self.fxa_url = self.DEV_PROFILE_SERVER
 
-
     def fetch_profile(self, bearer_token):
-        '''
+        """
         Fetch a profile JSON blob from the FxA profile server and
         return a tuple of (email address, nickname)
 
@@ -23,7 +23,7 @@ class FxaProfileServer(object):
           "email": "user@example.domain",
           "avatar": "https://secure.gravatar.com/avatar/6d940dd41e636cc156074109b8092f96"
         }
-        '''
+        """
         email_address = display_name = ''
 
         headers = {'Authorization': 'Bearer %s' % bearer_token}
@@ -37,6 +37,4 @@ class FxaProfileServer(object):
         except:
             return ('', '')
 
-
         return (email_address, display_name)
-

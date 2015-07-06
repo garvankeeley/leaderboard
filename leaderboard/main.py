@@ -13,8 +13,8 @@ from leaderboard.db import (
 
 # This needs to be run before *any* TLS connections are made
 import urllib3.contrib.pyopenssl
-urllib3.contrib.pyopenssl.inject_into_urllib3()
 
+urllib3.contrib.pyopenssl.inject_into_urllib3()
 
 BEARER_TOKEN_HEADER = 'Authorization'
 FXA_SECRET = "3015f44423df9a5f08d0b5cd43e0cbb6f82c56e37f09a3909db293e17a9e64af"
@@ -87,8 +87,8 @@ class AddStumblesForContributor(object):
         # resp.status = falcon.HTTP_202 # or 200?
         route_endpoints.add_stumbles_for_contributor(email=email,
                                                      display_name=nick,
-                                                     login_token=token,
                                                      query_json=as_json)
+
 
 init_sessions()
 
@@ -102,5 +102,6 @@ app.add_route('/backend/add_stumbles', AddStumblesForContributor())
 
 if __name__ == '__main__':
     from wsgiref import simple_server
+
     httpd = simple_server.make_server('127.0.0.1', 8050, app)
     httpd.serve_forever()

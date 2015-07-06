@@ -4,7 +4,7 @@ from leaderboard.models.country_bounds import CountryBounds
 from leaderboard.geo_util import coord_utils
 from leaderboard.models.contributor import Contributor
 from leaderboard.models.tile import Tile
-from leaderboard.models import calendar_report_factory
+from leaderboard.models import reportweeks
 from test_base import BaseTest
 
 
@@ -32,7 +32,7 @@ class TestModels(BaseTest):
             self.session.add(contributor)
             self.session.add(tile)
 
-            calendar_report_factory.insert_or_update_quartermonth(contributor, tile)
+            reportweeks.insert_or_update_reportweek(contributor, tile)
 
     def test_add_tile_for_coord(self):
         with self.session.begin(subtransactions=True):

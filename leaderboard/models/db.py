@@ -71,8 +71,8 @@ class DB(object):
         from leaderboard.models.country_bounds import CountryBounds  # NOQA
         from leaderboard.models.contributor import Contributor  # NOQA
         from leaderboard.models.tile import Tile   # NOQA
-        from leaderboard.models.calendar_report_factory import get_current_quartermonth_table_class
-        wk = get_current_quartermonth_table_class()
+        from leaderboard.models.reportweeks import get_current_reportweek_class
+        wk = get_current_reportweek_class()
         if self.table_exists(wk.__tablename__):
             t = wk.__table__
             t.drop(get_db().engine)

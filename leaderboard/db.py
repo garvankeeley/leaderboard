@@ -56,12 +56,14 @@ def get_engine(uri):
     options['execution_options'] = {'autocommit': True}
     return create_engine(uri, **options)
 
+
 session_factory = scoped_session(sessionmaker(expire_on_commit=False,
                                               autocommit=True))
 
 dsn = conn_str()
 engine = get_engine(dsn)
 Base = declarative_base(engine)
+
 
 def init_sessions():
     # Setup the global database engine and session manager
