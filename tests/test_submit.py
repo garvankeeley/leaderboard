@@ -4,12 +4,13 @@ from leaderboard.models.reportweeks import get_current_reportweek_class
 from leaderboard.route_endpoints.submit_contributor_observations import add_stumbles_for_contributor
 from test_base import BaseTest
 from nose.tools import eq_
+import json
 
 canada_observations_json = '''
-    [
+    {"items":[
         { "tile_easting_northing":"-8872100,5435700", "observations":100 },
         { "tile_easting_northing":"-8872100,5435700", "observations":1 }
-    ]
+    ]}
 '''
 
 BEARER_TOKEN = 'abc'
@@ -20,9 +21,9 @@ class TestSubmit(BaseTest):
         contributor = create_one_contributor()
         submit_helper(canada_observations_json, contributor)
         # check contributor has 1 tile, 1 weekX row, and total obs is 101
-        weekly_per_tile = contributor.get_reports_weekly()
+        weekly_per_tile = contributor.get_report_for_current_week().values()
         eq_(len(weekly_per_tile), 1)
-        single_week = weekly_per_tile[0]
+        single_week = weekly_per_tile[0][0]
         assert isinstance(single_week, get_current_reportweek_class())
         eq_(single_week.observation_count, 101)
         eq_(single_week.tile.country.name.lower(), 'canada')
@@ -36,12 +37,15 @@ class TestSubmit(BaseTest):
             session.add(contributor)
             nick = contributor.nickname
         nickname = time.time()
+
+        # this will update the nick
         add_stumbles_for_contributor(contributor.email, nickname,
-                                     canada_observations_json)
+                             json.loads(canada_observations_json))
+
         # check contributor has 1 tile, 1 weekX row, and total obs is 101
-        weekly_per_tile = contributor.get_reports_weekly()
+        weekly_per_tile = contributor.get_report_for_current_week().values()
         eq_(len(weekly_per_tile), 1)
-        single_week = weekly_per_tile[0]
+        single_week = weekly_per_tile[0][0]
         assert isinstance(single_week, get_current_reportweek_class())
         eq_(single_week.observation_count, 101)
         eq_(single_week.tile.country.name.lower(), 'canada')
@@ -65,5 +69,5 @@ def create_one_contributor():
     return contributor
 
 
-def submit_helper(json, contributor):
-    add_stumbles_for_contributor(contributor.email, contributor.nickname, json)
+def submit_helper(json_as_string, contributor):
+    add_stumbles_for_contributor(contributor.email, contributor.nickname, json.loads(json_as_string))
