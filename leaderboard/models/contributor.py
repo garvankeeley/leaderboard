@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
-from db import get_db
 from leaderboard.db import Base
+
 
 class Contributor(Base):
     __tablename__ = 'contributor'
@@ -11,5 +11,6 @@ class Contributor(Base):
 
     def get_reports_weekly(self):
         from leaderboard.models.reportweeks import get_current_reportweek_class
+
         weeks = getattr(self, '%ss' % get_current_reportweek_class().__tablename__)
         return weeks

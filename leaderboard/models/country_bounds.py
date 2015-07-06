@@ -3,9 +3,9 @@ from sqlalchemy import Column, Integer, String
 from leaderboard.geo_util import coord_sys as cs
 from leaderboard.db import session_factory, Base
 from leaderboard.geo_util.coord_sys import WGS84_LATLON_CODE
-from leaderboard.models.db import get_db
 
 creation_command = 'ogr2ogr -f PostgreSQL PG:"port=5432" *.geo.json -nln country_bounds'
+
 
 class CountryBounds(Base):
     __tablename__ = 'country_bounds'
@@ -21,6 +21,7 @@ class CountryBounds(Base):
     def load_countries():
         import ogr
         import os
+
         pwd = os.path.dirname(os.path.abspath(__file__))
         infile = "%s/../fixtures/world.geo.json" % pwd
         drv = ogr.GetDriverByName('GeoJSON')
@@ -32,16 +33,17 @@ class CountryBounds(Base):
         session = session_factory()
         with session.begin(subtransactions=True):
             for feature in layer:
-                id = feature.GetFID()
+                fid = feature.GetFID()
                 name = feature.GetField(0)
                 geo = feature.GetGeometryRef()
                 wkb = 'SRID=%d;%s' % (CountryBounds.coord_sys(), geo.ExportToWkt())
-                country = CountryBounds(ogc_fid=id, wkb_geometry=wkb, name=name)
+                country = CountryBounds(ogc_fid=fid, wkb_geometry=wkb, name=name)
                 session.add(country)
 
     @staticmethod
     def set_country_for_tile(tile, use_intersect=False, use_nearby=False):
         from tile import Tile
+
         assert isinstance(tile, Tile)
         geo = tile.geo_as_wgs84()
 
@@ -52,8 +54,8 @@ class CountryBounds(Base):
             c = result.first()
 
             if not c or use_intersect:
-                result = session.query(CountryBounds).filter(\
-                                CountryBounds.wkb_geometry.ST_Intersects(geo))
+                result = session.query(CountryBounds).filter(
+                    CountryBounds.wkb_geometry.ST_Intersects(geo))
                 c = result.first()
 
             if not c or use_nearby:

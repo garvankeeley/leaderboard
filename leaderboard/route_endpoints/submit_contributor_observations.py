@@ -1,4 +1,3 @@
-import json
 from leaderboard.db import session_factory
 from leaderboard.models.tile import Tile
 from leaderboard.models.contributor import Contributor

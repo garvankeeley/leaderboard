@@ -10,13 +10,15 @@ from leaderboard.models.tile import Tile
 
 def current_week_number():
     # clarify that number starts at zero
-    assert(datetime.date(2015, 1, 1).isocalendar()[1] == 1)
+    assert (datetime.date(2015, 1, 1).isocalendar()[1] == 1)
     return datetime.datetime.now().isocalendar()[1]
 
 
 _week_classes_cache = {}
+
+
 def get_reportweek_class(week_num):
-    assert(0 < week_num < 54)
+    assert (0 < week_num < 54)
 
     tablename = 'reportweek%d' % week_num
     if tablename in _week_classes_cache:

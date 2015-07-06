@@ -5,7 +5,6 @@ from geoalchemy2 import Geometry
 from sqlalchemy.orm import relationship, backref
 
 from leaderboard.geo_util import coord_sys as cs
-from leaderboard.models.db import get_db
 from leaderboard.db import session_factory, Base
 from leaderboard.models.country_bounds import CountryBounds
 from leaderboard.geo_util import coord_utils
@@ -25,7 +24,7 @@ class Tile(Base):
     def geo_as_wgs84(self):
         session = session_factory()
         ewkt = "'" + session.execute(func.ST_AsEWKT(self.geometry)).first().values()[0] + "'" + '::geometry'
-        #select ST_Transform('SRID=3785;POLYGON((-8839000 5419000,-8839000 5419500,-8838500 5419500,-8838500 5419000,-8839000 5419000))', 4326);
+        # select ST_Transform('SRID=3785;POLYGON((-8839000 5419000,-8839000 5419500,-8838500 5419500,-8838500 5419000,-8839000 5419000))', 4326);
         r = session.execute("select ST_AsEWKT(ST_Transform(%s, %d))" % (ewkt, cs.WGS84_LATLON_CODE))
         return r.fetchone()[0]
 

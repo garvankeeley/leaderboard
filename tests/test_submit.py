@@ -12,8 +12,8 @@ canada_observations_json = '''
     ]
 '''
 
-
 BEARER_TOKEN = 'abc'
+
 
 class TestSubmit(BaseTest):
     def test_submit(self):
@@ -29,6 +29,7 @@ class TestSubmit(BaseTest):
 
     def test_submit_server_new_nick(self):
         import time
+
         session = session_factory()
         contributor = create_one_contributor()
         with session.begin():
@@ -36,7 +37,7 @@ class TestSubmit(BaseTest):
             nick = contributor.nickname
         nickname = time.time()
         add_stumbles_for_contributor(contributor.email, nickname,
-                canada_observations_json)
+                                     canada_observations_json)
         # check contributor has 1 tile, 1 weekX row, and total obs is 101
         weekly_per_tile = contributor.get_reports_weekly()
         eq_(len(weekly_per_tile), 1)
