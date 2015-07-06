@@ -26,12 +26,10 @@ def add_stumbles_for_contributor(email, display_name, login_token, query_json):
             # Need to add to the session to mark as dirty
             session.add(contributor)
 
-        import pdb
-        pdb.set_trace()
         for row in json_object['items']:
             tile_coord = row[key_tile_easting_northing]
             east, north = tile_coord.split(",")
-            tile = Tile.get_tile_mercator(int(east), int(north))
+            tile = Tile.get_tile_mercator(int(float(east)), int(float(north)))
             week_per_tile = insert_or_update_quartermonth(contributor, tile)
             obs = row[key_observations]
             if not week_per_tile.observation_count:
