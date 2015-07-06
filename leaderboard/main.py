@@ -1,5 +1,6 @@
 import falcon
 import json
+import requests
 from leaderboard.util.gz_compress import gzip_decompress
 from leaderboard.route_endpoints import get_leaders
 from leaderboard import route_endpoints
@@ -16,6 +17,7 @@ import urllib3.contrib.pyopenssl
 urllib3.contrib.pyopenssl.inject_into_urllib3()
 
 BEARER_TOKEN_HEADER = 'Authorization'
+FXA_SECRET = "3015f44423df9a5f08d0b5cd43e0cbb6f82c56e37f09a3909db293e17a9e64af"
 
 
 def crossdomain(req, resp):
@@ -23,7 +25,7 @@ def crossdomain(req, resp):
     resp.set_header('Access-Control-Allow-Origin', '*')
 
 
-class FetchLeaders:
+class FetchLeaders(object):
     def on_get(self, req, resp):
         resp.content_type = "application/json"
         country_id = int(req.query_string)
@@ -31,7 +33,22 @@ class FetchLeaders:
         resp.body = json.dumps(json_obj)
 
 
-class AddStumblesForContributor:
+class FxAResource(object):
+    def on_get(self, req, resp):
+        """Handles GET requests"""
+
+        payload = {"client_id": "d0f6d2ed3c5fcc3b",
+                   "client_secret": FXA_SECRET,
+                   "code": req.params['code']}
+
+        fxa_resp = requests.post("https://oauth-stable.dev.lcip.org/v1/token",
+                                 data=json.dumps(payload))
+
+        resp.content_type = "text/html"
+        resp.body = fxa_resp.text
+
+
+class AddStumblesForContributor(object):
     def token_ok(self, req):
         token = req.get_header(BEARER_TOKEN_HEADER, '')
         if token.startswith('Bearer'):
@@ -78,6 +95,8 @@ init_sessions()
 session_manager = middleware.SQLAlchemySessionManager(session_factory)
 app = falcon.API(middleware=[session_manager],
                  after=[crossdomain])
+
+app.add_route('/fxa/callback', FxAResource())
 app.add_route('/backend/leaders', FetchLeaders())
 app.add_route('/backend/add_stumbles', AddStumblesForContributor())
 
