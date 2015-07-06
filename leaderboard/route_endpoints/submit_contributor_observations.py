@@ -8,18 +8,27 @@ key_observations = 'observations'
 
 
 def add_stumbles_for_contributor(email, display_name, login_token, query_json):
+    # Hack
+    json_object = query_json
+
     session = session_factory()
     with session.begin(subtransactions=True):
         contributor = session.query(Contributor).filter_by(email=email).first()
-        if contributor.nickname != display_name:
+
+        if contributor is None:
+            contributor = Contributor(nickname=display_name,
+                                      email=email)
+            session.add(contributor)
+        elif contributor.nickname != display_name:
+            # Update the displayname
             contributor.nickname = display_name
+
+            # Need to add to the session to mark as dirty
             session.add(contributor)
 
-        if not contributor:
-            return False
-
-        json_object = json.loads(query_json)
-        for row in json_object:
+        import pdb
+        pdb.set_trace()
+        for row in json_object['items']:
             tile_coord = row[key_tile_easting_northing]
             east, north = tile_coord.split(",")
             tile = Tile.get_tile_mercator(int(east), int(north))
