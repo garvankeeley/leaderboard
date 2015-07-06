@@ -45,8 +45,6 @@ class AddStumblesForContributor:
             return None
 
     def on_post(self, req, resp):
-        import pdb
-        pdb.set_trace()
         resp.content_type = 'application/json'
         token_resp = self.token_ok(req)
         if token_resp is None:

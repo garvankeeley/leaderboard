@@ -26,8 +26,6 @@ def add_stumbles_for_contributor(email, display_name, login_token, query_json):
             # Need to add to the session to mark as dirty
             session.add(contributor)
 
-        import pdb
-        pdb.set_trace()
         for row in json_object['items']:
             tile_coord = row[key_tile_easting_northing]
             east, north = tile_coord.split(",")
