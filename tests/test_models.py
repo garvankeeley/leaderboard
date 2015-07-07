@@ -1,8 +1,11 @@
 import math
+from sqlalchemy.orm.exc import NoResultFound
+from leaderboard.db import session_factory
 
 from leaderboard.models.country_bounds import CountryBounds
 from leaderboard.geo_util import coord_utils
 from leaderboard.models.contributor import Contributor
+from leaderboard.models.db import LeaderboardGlobals
 from leaderboard.models.tile import Tile
 from leaderboard.models import reportweeks
 from test_base import BaseTest
@@ -57,3 +60,28 @@ class TestModels(BaseTest):
         e2, n2 = coord_utils.db_get_easting_northing(-80, 44)
         assert math.fabs(e1 - e2) < 5
         assert math.fabs(n1 - n2) < 5
+
+    def test_weekly_rollover(self):
+        # add data
+        self.test_add_contributor_tile_and_report()
+        week_class = reportweeks.get_current_reportweek_class()
+        session = session_factory()
+        rows = None
+        try:
+            rows = session.query(week_class).one()
+        except NoResultFound:
+            pass
+        assert rows
+
+        g = LeaderboardGlobals.get_globals()
+        g.current_week = reportweeks.current_week_number() - 1
+
+        # verify data gets truncated on next access
+        week_class = reportweeks.get_current_reportweek_class()
+        session = session_factory()
+        rows = None
+        try:
+            rows = session.query(week_class).one()
+        except NoResultFound:
+            pass
+        assert not rows

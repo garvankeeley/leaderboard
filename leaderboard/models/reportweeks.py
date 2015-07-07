@@ -3,14 +3,13 @@ from sqlalchemy import Column, BigInteger, Integer, ForeignKey, and_
 from sqlalchemy.orm import relationship, backref
 from leaderboard.models.contributor import Contributor
 from leaderboard.db import session_factory, Base
-from leaderboard.models.db import get_db
+from leaderboard.models.db import get_db, DB, LeaderboardGlobals
 from leaderboard.models.tile import Tile
-
 
 # Weeks are 1-53, every 5.6 years, a year has 53 weeks
 
 def current_week_number():
-    # clarify that number starts at zero
+    # clarify that number starts at one
     assert (datetime.date(2015, 1, 1).isocalendar()[1] == 1)
     return datetime.datetime.now().isocalendar()[1]
 
@@ -26,6 +25,11 @@ def get_reportweek_class(week_num):
     assert (0 < week_num < 54)
 
     tablename = 'reportweek%d' % week_num
+
+    if LeaderboardGlobals.is_week_rolling_over():
+        session = session_factory()
+        session.execute('truncate table %s;' % tablename)
+
     if tablename in _week_classes_cache:
         return _week_classes_cache[tablename]
 
@@ -38,6 +42,7 @@ def get_reportweek_class(week_num):
         tile = relationship(Tile)
         observation_count = Column(BigInteger)
     _week_classes_cache[tablename] = Week
+
     return Week
 
 
@@ -48,6 +53,7 @@ def get_reportweek_for_contributor_and_tile(contributor, tile):
         result = session.query(week_class).filter(and_(week_class.contributor_id == contributor.id,
                                                      week_class.tile_id == tile.id))
         return result.first() if result else None
+
 
 def get_current_reportweek_class():
     return get_reportweek_class(current_week_number())

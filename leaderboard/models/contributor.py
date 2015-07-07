@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from leaderboard.db import Base, session_factory
+from leaderboard.db import Base
 
 
 class Contributor(Base):
