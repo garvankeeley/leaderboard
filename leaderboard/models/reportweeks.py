@@ -11,7 +11,7 @@ from leaderboard.models.tile import Tile
 def current_week_number():
     # clarify that number starts at one
     assert (datetime.date(2015, 1, 1).isocalendar()[1] == 1)
-    return datetime.datetime.now().isocalendar()[1]
+    return datetime.datetime.utcnow().isocalendar()[1]
 
 
 def max_week_in_year():

@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, CheckConstraint
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.engine.reflection import Inspector
@@ -13,33 +13,29 @@ from leaderboard.db import session_factory
 
 
 class LeaderboardGlobals(Base):
-    """ Store global info here such as the current_week for the weekly rollover
-        """
-    __tablename__ = 'leaderboard_globals'
+    """ Store global infdo here such as the current_week for the weekly rollover """
+    __tablename__ = 'leadsserboard_globals'
     current_week = Column(Integer)
     id = Column(Integer, primary_key=True)
-    cached_instance = None
+    CheckConstraint("0 < current_week and current_week < 54")
 
     @staticmethod
     def get_globals():
-        if not LeaderboardGlobals.cached_instance:
-            session = session_factory()
-            with session.begin(subtransactions=True):
-                try:
-                    LeaderboardGlobals.cached_instance = \
-                        session.query(LeaderboardGlobals).one()
-                except NoResultFound:
-                    return None
-
-        return LeaderboardGlobals.cached_instance
+        session = session_factory()
+        with session.begin(subtransactions=True):
+            try:
+                return session.query(LeaderboardGlobals).one()
+            except NoResultFound:
+                lg = LeaderboardGlobals()
+                session.add(lg)
+                return lg
 
     @staticmethod
     def get_current_week():
         g = LeaderboardGlobals.get_globals()
-        if not g or not g.current_week or not 0 < g.current_week < 54:
+        if not g.current_week or not 0 < g.current_week < 54:
             session = session_factory()
             with session.begin(subtransactions=True):
-                g = LeaderboardGlobals()
                 g.current_week = datetime.date.today().year
                 session.add(g)
 
@@ -47,6 +43,14 @@ class LeaderboardGlobals(Base):
 
     @staticmethod
     def is_week_rolling_over():
+        """ Weeks 1-53 are stored in the db, and are reused as the year rolls over.
+        As week 1 turns into week2 (for example), week2 must be truncated before using it.
+        The current week is stored in the LeaderboardGlobals.
+        This function both checks for rollover, and updates the db to the new week.
+
+        :return: True if the actual week is greater than the current week in the db
+        """
+
         from leaderboard.models import reportweeks
 
         week_in_db = LeaderboardGlobals.get_current_week()
@@ -55,8 +59,9 @@ class LeaderboardGlobals(Base):
         if is_rollover:
             session = session_factory()
             with session.begin(subtransactions=True):
-                LeaderboardGlobals.get_globals().current_week = actual_week
-                # victor, is this use of session correct?
+                  lbGlobals = LeaderboardGlobals.get_globals()
+                  lbGlobals.current_week = actual_week
+                  session.add(lbGlobals)
         return is_rollover
 
 
